@@ -6,4 +6,4 @@ InputBox for Windows command line.
 echo|set /p="@set mytmp=">1.bat\
 inputbox -message "input string">>1.bat\
 1.bat\
-echo %mytmp%\
+echo %mytmp%
