@@ -1,111 +1,98 @@
 ﻿#include "UTL_Cmd.h"
 #include "UTL_Conversion.h"
 
-bool UTL_Cmd::IsHelp(wstring comm)
+UTL_Cmd::UTL_Cmd()
 {
-	comm = UTL_Conversion::ToLower(comm);
-	if (comm == _T("-?") || comm == _T("-help") || comm == _T("-h")) return true;
-	return false;
+	arguments.clear();
 }
 
-bool UTL_Cmd::IsTitle(wstring comm)
+UTL_Cmd::~UTL_Cmd()
 {
-	comm = UTL_Conversion::ToLower(comm);
-	if (comm == _T("-title")) return true;
-	return false;
-}
-
-bool UTL_Cmd::IsMessage(wstring comm)
-{
-	comm = UTL_Conversion::ToLower(comm);
-	if (comm == _T("-message")) return true;
-	return false;
-}
-
-bool UTL_Cmd::IsDefault(wstring comm)
-{
-	comm = UTL_Conversion::ToLower(comm);
-	if (comm == _T("-default") || comm == _T("-def")) return true;
-	return false;
-}
-
-bool UTL_Cmd::IsPassword(wstring comm)
-{
-	comm = UTL_Conversion::ToLower(comm);
-	if (comm == _T("-pass") || comm == _T("-password")) return true;
-	return false;
 }
 
 void UTL_Cmd::Help()
 {
-	_tprintf(_T("InputBox 0.1\n"));
+	_tprintf(_T("InputBox 0.2\n"));
 	_tprintf(_T("	InputBox for command line. Amiga Rulez!\n"));
 	_tprintf(_T("\nUsage:\n"));
 	_tprintf(_T("	InputBox [OPTIONS]\n"));
 	_tprintf(_T("\nOptions:\n"));
-	_tprintf(_T("	-title TITLE\n"));
-	_tprintf(_T("		The TITLE argument specifies the title of the input box.\n"));
-	_tprintf(_T("	-message MESSAGE\n"));
-	_tprintf(_T("		The MESSAGE argument specifies the text of the input box. Newline can be embedded using \\n.\n"));
-	_tprintf(_T("	-pass\n"));
-	_tprintf(_T("		The pass switch specifies that the text in the string gadget should be displayed with '*' characters, e.g. for entering passwords that should not be visible to a person behind the user.\n"));
-	_tprintf(_T("	-default MESSAGE\n"));
-	_tprintf(_T("		The MESSAGE argument specifies the default text of the input box.\n"));
+
+	for (const auto &it : arguments)
+	{
+		for (const auto& text : it.text) {
+			_tprintf((_T("	") + text + _T(" aaa\n")).c_str());
+		}
+		_tprintf((_T("		") + it.help + _T("\n")).c_str());
+	}
 }
 
-int UTL_Cmd::ParseCommandLinbe(int argc, _TCHAR* argv[], int& iCorrectParameters, bool& bHelp, wstring& title, wstring& message, bool& bPassword, wstring& def)
+void UTL_Cmd::Add(ARGUMENT_TYPE type, void* var, int num, ...)
+{
+	ARGUMENT arg;
+	arg.text.clear();
+	arg.type = type;
+	arg.var = var;
+
+	va_list arglist;
+	num++;
+	va_start(arglist, num);
+	for (int x = 0; x < num - 1; x++) {
+		LPCWSTR tmp = va_arg(arglist, LPCWSTR);
+		arg.text.push_back(tmp);
+	}
+	arg.help = va_arg(arglist, LPCWSTR);
+	va_end(arglist);
+
+	arguments.push_back(arg);
+}
+
+int UTL_Cmd::ParseCommandLinbe(int argc, _TCHAR* argv[], int& iCorrectParameters)
 {
 	iCorrectParameters = 0;
 
 	for (int i = 0; i < argc; i++) {
-		wstring tmp = argv[i];
-		tmp = UTL_Conversion::TrimWhiteChar(tmp);
-
-		if (UTL_Cmd::IsHelp(tmp)) {
-			bHelp = true;
-			iCorrectParameters++;
-			continue;
-		}
-
-		if (UTL_Cmd::IsTitle(tmp)) {
-			i++;
-			if (i < argc) {
-				tmp = argv[i];
-				tmp = UTL_Conversion::TrimWhiteChar(tmp);
-				title = tmp;
-				iCorrectParameters++;
+		for (unsigned int a = 0; a < arguments.size(); a++) {
+			if (find(arguments[a].text.begin(), arguments[a].text.end(), UTL_Conversion::TrimWhiteChar(argv[i])) != arguments[a].text.end()) {
+				if (arguments[a].type == _STRING) {
+					i++;
+					if (i < argc) {
+						wstring tmp = UTL_Conversion::TrimWhiteChar(argv[i]);
+						UTL_Conversion::StringReplaceAll(tmp, _T("\\n"), _T("\n"));
+						*((wstring*)arguments[a].var) = tmp;
+						iCorrectParameters++;
+					}
+					break;
+				}
+				else if (arguments[a].type == _BOOL) {
+					*((bool*)arguments[a].var) = !*((bool*)arguments[a].var);
+					iCorrectParameters++;
+					break;
+				}
+				else if (arguments[a].type == _TRUE) {
+					*((bool*)arguments[a].var) = true;
+					iCorrectParameters++;
+					break;
+				}
+				else if (arguments[a].type == _INT) {
+					i++;
+					if (i < argc) {
+						*((int*)arguments[a].var) = UTL_Conversion::ToInt(UTL_Conversion::TrimWhiteChar(argv[i]));
+						iCorrectParameters++;
+					}
+					break;
+				}
+				else if (arguments[a].type == _COLOR) {
+					i++;
+					if (i < argc) {
+						((pair<bool, wstring>*)arguments[a].var)->first = true;
+						((pair<bool, wstring>*)arguments[a].var)->second = UTL_Conversion::TrimWhiteChar(argv[i]);
+						iCorrectParameters++;
+					}
+					break;
+				}
 			}
-			continue;
-		}
-
-		if (UTL_Cmd::IsMessage(tmp)) {
-			i++;
-			if (i < argc) {
-				tmp = argv[i];
-				tmp = UTL_Conversion::TrimWhiteChar(tmp);
-				message = tmp;
-				iCorrectParameters++;
-			}
-			continue;
-		}
-
-		if (UTL_Cmd::IsPassword(tmp)) {
-			i++;
-			bPassword = true;
-			continue;
-		}
-
-		if (UTL_Cmd::IsDefault(tmp)) {
-			i++;
-			if (i < argc) {
-				tmp = argv[i];
-				tmp = UTL_Conversion::TrimWhiteChar(tmp);
-				def = tmp;
-				iCorrectParameters++;
-			}
-			continue;
 		}
 	}
-
 	return 0;
 }

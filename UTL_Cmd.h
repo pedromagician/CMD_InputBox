@@ -5,13 +5,23 @@
 class UTL_Cmd
 {
 public:
-	static int ParseCommandLinbe(int argc, _TCHAR* argv[], int &iCorrectParameters, bool& bHelp, wstring &title, wstring &message, bool &bPassword, wstring& def);
+	enum ARGUMENT_TYPE { _STRING, _TRUE, _BOOL, _INT, _COLOR };
+	struct ARGUMENT {
+		vector<wstring>	text;
+		ARGUMENT_TYPE	type;
+		void*			var;
+		wstring			help;
+	};
 
-	static bool IsHelp(wstring comm);
-	static bool IsTitle(wstring comm);
-	static bool IsMessage(wstring comm);
-	static bool IsPassword(wstring comm);
-	static bool IsDefault(wstring comm);
+private:
+	vector<ARGUMENT> arguments;
 
-	static void Help();
+public:
+	UTL_Cmd();
+	~UTL_Cmd();
+	void Add(ARGUMENT_TYPE type, void* var, int num, ...);
+
+	int ParseCommandLinbe(int argc, _TCHAR* argv[], int& iCorrectParameters);
+
+	void Help();
 };

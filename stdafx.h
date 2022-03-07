@@ -6,6 +6,10 @@
 #include <atlbase.h>
 #include <activscp.h>
 #include <comdef.h>
+#include <iostream>
+#include <string>
+#include <vector>
 #include "tchar.h"
+#include "resource.h"
 
 using namespace std;

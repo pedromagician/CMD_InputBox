@@ -3,11 +3,33 @@
 class InputBox
 {
 public:
-	static void Input(const wstring& title, const wstring &prompt, const wstring& def, wstring& strResult);
-	static void Password(const wstring& title, const wstring& prompt, const wstring& def, wstring& strResult);
+	static int width;
+	static int fontSize;
+	static int linesOfText;
+	static bool password;
+	static wstring fontName;
+
+	static pair<bool, wstring> brush;
+	static pair<bool, wstring> background;
+	static pair<bool, wstring> pen;
+
+	static wstring title;
+	static wstring prompt;
+	static wstring def;
+
+	static bool GetString(wstring &result);
 
 private:
-	static void NewLineToVBSNewLine(wstring &buff);
-	static LRESULT CALLBACK InputBoxCallback(int nCode, WPARAM wParam, LPARAM lParam);
-	static void InputBoxHelper(wstring title, wstring prompt, wstring def, bool pass, wstring &strResult);
+	static HFONT hFont;
+	static HWND  hWndParent;
+	static HWND  hWndPrompt;
+	static HWND  hWndInputBox;
+	static HWND  hWndEdit;
+	static HWND  hWndOK;
+	static HWND  hWndCancel;
+	static HBRUSH hbrBkgnd;
+
+	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	static void SetTextAlignment(HWND hwnd, int textAlignment);
 };
