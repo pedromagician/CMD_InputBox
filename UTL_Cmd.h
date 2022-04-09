@@ -5,23 +5,45 @@
 class UTL_Cmd
 {
 public:
-	enum ARGUMENT_TYPE { _STRING, _TRUE, _BOOL, _INT, _COLOR };
+	enum ARGUMENT_TYPE { _STRING, _TRUE, _BOOL, _INT, _COLOR, _ENUM };
 	struct ARGUMENT {
-		vector<wstring>	text;
-		ARGUMENT_TYPE	type;
-		void*			var;
-		wstring			help;
+		vector<wstring>		text;
+		ARGUMENT_TYPE		type;
+		void* pVar;
+		map<wstring, UINT>* pTable;
+		wstring				help;
+	};
+
+	enum Type {
+		Ok = MB_OK,
+		OkCancel = MB_OKCANCEL,
+		YesNo = MB_YESNO,
+		YesNoCancel = MB_YESNOCANCEL,
+	};
+
+	enum Icon {
+		NoIcon = 0x00000000L,
+		Information = MB_ICONINFORMATION,
+		Question = MB_ICONQUESTION,
+		Warning = MB_ICONWARNING,
+		Error = MB_ICONERROR,
+	};
+
+	enum DefaultButton {
+		Def1 = MB_DEFBUTTON1,
+		Def2 = MB_DEFBUTTON2,
+		Def3 = MB_DEFBUTTON3,
 	};
 
 private:
-	vector<ARGUMENT> arguments;
+	vector<ARGUMENT> mArguments;
 
 public:
 	UTL_Cmd();
 	~UTL_Cmd();
-	void Add(ARGUMENT_TYPE type, void* var, int num, ...);
+	void Add(ARGUMENT_TYPE _type, int _num, ...);
 
-	int ParseCommandLinbe(int argc, _TCHAR* argv[], int& iCorrectParameters);
+	int ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParameters);
 
 	void Help();
 };

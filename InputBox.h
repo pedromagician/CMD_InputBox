@@ -17,19 +17,19 @@ public:
 	static wstring prompt;
 	static wstring def;
 
-	static bool GetString(wstring &result);
+	static bool GetString(wstring& _result);
 
 private:
-	static HFONT hFont;
-	static HWND  hWndParent;
-	static HWND  hWndPrompt;
-	static HWND  hWndInputBox;
-	static HWND  hWndEdit;
-	static HWND  hWndOK;
-	static HWND  hWndCancel;
-	static HBRUSH hbrBkgnd;
+	static HFONT mhFont;
+	static HWND  mhWndParent;
+	static HWND  mhWndPrompt;
+	static HWND  mhWndInputBox;
+	static HWND  mhWndEdit;
+	static HWND  mhWndOK;
+	static HWND  mhWndCancel;
+	static HBRUSH mhbrBkgnd;
 
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam);
 
-	static void SetTextAlignment(HWND hwnd, int textAlignment);
+	static void SetTextAlignment(HWND _hwnd, int _textAlignment);
 };

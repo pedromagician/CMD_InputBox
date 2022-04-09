@@ -8,6 +8,7 @@
 #include <comdef.h>
 #include <iostream>
 #include <string>
+#include <map>
 #include <vector>
 #include "tchar.h"
 #include "resource.h"

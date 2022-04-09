@@ -1,74 +1,93 @@
 ﻿#include "UTL_conversion.h"
 
-int UTL_Conversion::ToInt(const wstring& buff, int base)
+#define WHITE_SPACE_CHARACTERS _T(" \t\n\v\f\r ")
+
+int UTL_Conversion::ToInt(const wstring& _buff, int _base)
 {
-	return _tcstol(buff.c_str(), nullptr, base);
+	return _tcstol(_buff.c_str(), nullptr, _base);
 }
 
-wstring UTL_Conversion::LeftTrimString(wstring str, const wstring& val)
+wstring UTL_Conversion::LeftTrimString(wstring _str, const wstring& _val)
 {
-	size_t start = str.find_first_not_of(val);
-	str = (start == string::npos) ? _T("") : str.substr(start);
-	return str;
+	wstring::size_type pos = _str.find_first_not_of(_val);
+	if (pos != wstring::npos)
+		_str.erase(0, pos);
+	else
+		_str.erase(_str.begin(), _str.end());
+
+	return _str;
 }
 
-wstring UTL_Conversion::RightTrimString(wstring str, const wstring& val)
+wstring UTL_Conversion::RightTrimString(wstring _str, const wstring& _val)
 {
-	size_t end = str.find_last_not_of(val);
-	str = (end == string::npos) ? _T("") : str.substr(0, end + 1);
-	return str;
+	wstring::size_type pos = _str.find_last_not_of(_val);
+	if (pos != wstring::npos)
+		_str.erase(pos + 1);
+	else
+		_str.erase(_str.begin(), _str.end());
+
+	return _str;
 }
 
-wstring UTL_Conversion::TrimString(wstring str, const wstring& val)
+wstring UTL_Conversion::TrimString(wstring _str, const wstring& _val)
 {
-	str = LeftTrimString(str, val);
-	str = RightTrimString(str, val);
-	return str;
-}
-
-wstring UTL_Conversion::TrimWhiteChar(const wstring& str)
-{
-	return TrimString(str, _T(" \t\n\v\f\r "));
-}
-
-wstring UTL_Conversion::ToLower(wstring str)
-{
-	transform(str.begin(), str.end(), str.begin(), [](wchar_t c) { return towlower(c); });
-	return str;
-}
-
-void UTL_Conversion::StringReplaceAll(wstring& mess, const wstring& oldStr, const wstring& newStr)
-{
-	const size_t oldLen = oldStr.length();
-	const size_t newLen = newStr.length();
-	size_t position = 0;
-	while ((position = mess.find(oldStr, position)) != string::npos)
+	wstring::size_type pos = _str.find_last_not_of(_val);
+	if (pos != wstring::npos)
 	{
-		mess.replace(position, oldLen, newStr);
+		_str.erase(pos + 1);
+		pos = _str.find_first_not_of(_val);
+		if (pos != wstring::npos)
+			_str.erase(0, pos);
+	}
+	else
+		_str.erase(_str.begin(), _str.end());
+
+	return _str;
+}
+
+wstring UTL_Conversion::TrimWhiteChar(const wstring& _val)
+{
+	return TrimString(_val, WHITE_SPACE_CHARACTERS);
+}
+
+wstring UTL_Conversion::ToLower(wstring _val)
+{
+	transform(_val.begin(), _val.end(), _val.begin(), [](wchar_t c) { return towlower(c); });
+	return _val;
+}
+
+void UTL_Conversion::StringReplaceAll(wstring& _mess, const wstring& _oldStr, const wstring& _newStr)
+{
+	const size_t oldLen = _oldStr.length();
+	const size_t newLen = _newStr.length();
+	size_t position = 0;
+	while ((position = _mess.find(_oldStr, position)) != string::npos)
+	{
+		_mess.replace(position, oldLen, _newStr);
 		position += newLen;
 	}
 }
 
-void UTL_Conversion::HexToRGB(wstring hex, int& r, int& g, int& b)
+void UTL_Conversion::HexToRGB(wstring _hex, int& _r, int& _g, int& _b)
 {
-	hex = TrimWhiteChar(hex);
-	hex = LeftTrimString(hex, _T("#"));
+	_hex = TrimWhiteChar(_hex);
+	_hex = LeftTrimString(_hex, _T("#"));
 
 	wstring sr = _T("ff"), sg = _T("ff"), sb = _T("ff");
-	if (hex.length() == 6) {
-		sr = hex.substr(0, 2);
-		sg = hex.substr(2, 2);
-		sb = hex.substr(4, 2);
+	if (_hex.length() == 6) {
+		sr = _hex.substr(0, 2);
+		sg = _hex.substr(2, 2);
+		sb = _hex.substr(4, 2);
 	}
-	else if (hex.length() == 3) {
-		sr = hex.substr(0, 1);
-		sg = hex.substr(1, 1);
-		sb = hex.substr(2, 1);
+	else if (_hex.length() == 3) {
+		sr = _hex.substr(0, 1);
+		sg = _hex.substr(1, 1);
+		sb = _hex.substr(2, 1);
 	}
 	else {
 		_tprintf(_T("Error - bad color\n"));
 	}
-	r = ToInt(sr, 16);
-	g = ToInt(sg, 16);
-	b = ToInt(sb, 16);
+	_r = ToInt(sr, 16);
+	_g = ToInt(sg, 16);
+	_b = ToInt(sb, 16);
 }

@@ -2,14 +2,14 @@
 #include "InputBox.h"
 #include "UTL_Conversion.h"
 
-HFONT	InputBox::hFont			= nullptr;
-HWND	InputBox::hWndParent	= nullptr;
-HWND	InputBox::hWndPrompt	= nullptr;
-HWND	InputBox::hWndInputBox	= nullptr;
-HWND	InputBox::hWndEdit		= nullptr;
-HWND	InputBox::hWndOK		= nullptr;
-HWND	InputBox::hWndCancel	= nullptr;
-HBRUSH	InputBox::hbrBkgnd		= nullptr;
+HFONT	InputBox::mhFont		= nullptr;
+HWND	InputBox::mhWndParent	= nullptr;
+HWND	InputBox::mhWndPrompt	= nullptr;
+HWND	InputBox::mhWndInputBox	= nullptr;
+HWND	InputBox::mhWndEdit		= nullptr;
+HWND	InputBox::mhWndOK		= nullptr;
+HWND	InputBox::mhWndCancel	= nullptr;
+HBRUSH	InputBox::mhbrBkgnd		= nullptr;
 
 int		InputBox::width					= 600;
 int		InputBox::fontSize				= 22;
@@ -25,61 +25,61 @@ pair<bool, wstring>	InputBox::brush		= pair<bool, wstring>(false, _T("#000000"))
 pair<bool, wstring> InputBox::background= pair<bool, wstring>(false, _T("#000000"));
 pair<bool, wstring> InputBox::pen		= pair<bool, wstring>(false, _T("#ffffff"));
 
-void InputBox::SetTextAlignment(HWND hwnd, int textAlignment)
+void InputBox::SetTextAlignment(HWND _hwnd, int _textAlignment)
 {
 	LONG_PTR tmp;
-	if (GetWindowLongPtr(hwnd, GWL_STYLE) != textAlignment) {
+	if (GetWindowLongPtr(_hwnd, GWL_STYLE) != _textAlignment) {
 		//clean up
-		if (textAlignment == 0) {
-			tmp = GetWindowLongPtr(hwnd, GWL_STYLE);
+		if (_textAlignment == 0) {
+			tmp = GetWindowLongPtr(_hwnd, GWL_STYLE);
 			tmp = tmp & ~(SS_LEFT);
-			SetWindowLongPtr(hwnd, GWL_STYLE, (LONG_PTR)tmp);
-		} else if (textAlignment == 1) {
-			tmp = GetWindowLongPtr(hwnd, GWL_STYLE);
+			SetWindowLongPtr(_hwnd, GWL_STYLE, (LONG_PTR)tmp);
+		} else if (_textAlignment == 1) {
+			tmp = GetWindowLongPtr(_hwnd, GWL_STYLE);
 			tmp = tmp & ~(SS_CENTER);
-			SetWindowLongPtr(hwnd, GWL_STYLE, (LONG_PTR)tmp);
-		} else if (textAlignment == 2) {
-			tmp = GetWindowLongPtr(hwnd, GWL_STYLE);
+			SetWindowLongPtr(_hwnd, GWL_STYLE, (LONG_PTR)tmp);
+		} else if (_textAlignment == 2) {
+			tmp = GetWindowLongPtr(_hwnd, GWL_STYLE);
 			tmp = tmp & ~(SS_RIGHT);
-			SetWindowLongPtr(hwnd, GWL_STYLE, (LONG_PTR)tmp);
+			SetWindowLongPtr(_hwnd, GWL_STYLE, (LONG_PTR)tmp);
 		}
 
 		//set new text alignment
-		if (textAlignment == 0) {
-			tmp = GetWindowLongPtr(hwnd, GWL_STYLE);
+		if (_textAlignment == 0) {
+			tmp = GetWindowLongPtr(_hwnd, GWL_STYLE);
 			tmp = tmp | (SS_LEFT);
-			SetWindowLongPtr(hwnd, GWL_STYLE, (LONG_PTR)tmp);
-		} else if (textAlignment == 1) {
-			tmp = GetWindowLongPtr(hwnd, GWL_STYLE);
+			SetWindowLongPtr(_hwnd, GWL_STYLE, (LONG_PTR)tmp);
+		} else if (_textAlignment == 1) {
+			tmp = GetWindowLongPtr(_hwnd, GWL_STYLE);
 			tmp = tmp | (SS_CENTER);
-			SetWindowLongPtr(hwnd, GWL_STYLE, (LONG_PTR)tmp);
-		} else if (textAlignment == 2) {
-			tmp = GetWindowLongPtr(hwnd, GWL_STYLE);
+			SetWindowLongPtr(_hwnd, GWL_STYLE, (LONG_PTR)tmp);
+		} else if (_textAlignment == 2) {
+			tmp = GetWindowLongPtr(_hwnd, GWL_STYLE);
 			tmp = tmp | (SS_RIGHT);
-			SetWindowLongPtr(hwnd, GWL_STYLE, (LONG_PTR)tmp);
+			SetWindowLongPtr(_hwnd, GWL_STYLE, (LONG_PTR)tmp);
 		}
-		SetWindowPos(hwnd, 0, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+		SetWindowPos(_hwnd, 0, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_DRAWFRAME);
 	}
 }
 
-LRESULT CALLBACK InputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam)
 {
 	LOGFONT lfont;
 	HINSTANCE hInst = nullptr;
 
-	switch (message) {
+	switch (_message) {
 		case WM_CTLCOLOREDIT:
 		case WM_CTLCOLORSTATIC:
 		{
 			int r = 0, g = 0, b = 0;
 			if (brush.first) {
-				if (hbrBkgnd == nullptr) {
+				if (mhbrBkgnd == nullptr) {
 					UTL_Conversion::HexToRGB(brush.second, r, g, b);
-					hbrBkgnd = CreateSolidBrush(RGB(r, g, b));
+					mhbrBkgnd = CreateSolidBrush(RGB(r, g, b));
 				}
 			}
 
-			HDC hdcStatic = (HDC)wParam;
+			HDC hdcStatic = (HDC)_wParam;
 			if (pen.first) {
 				UTL_Conversion::HexToRGB(pen.second, r, g, b);
 				SetTextColor(hdcStatic, RGB(r, g, b));
@@ -90,7 +90,7 @@ LRESULT CALLBACK InputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 				SetBkColor(hdcStatic, RGB(r, g, b));
 			}
 
-			return (INT_PTR)hbrBkgnd;
+			return (INT_PTR)mhbrBkgnd;
 			break;
 		}
 		case WM_CREATE: {
@@ -104,68 +104,68 @@ LRESULT CALLBACK InputBox::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			lfont.lfClipPrecision	= CLIP_DEFAULT_PRECIS;
 			lfont.lfQuality			= DEFAULT_QUALITY;
 			lfont.lfPitchAndFamily	= DEFAULT_PITCH;
-			hFont = CreateFontIndirect(&lfont);
+			mhFont = CreateFontIndirect(&lfont);
 
 			hInst = GetModuleHandle(nullptr);
 
 			if (InputBox::password)
-				hWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL | ES_PASSWORD , 5, 10 + fontSize / 2 + fontSize * linesOfText, InputBox::width - 30, fontSize + 2, hWnd, nullptr, hInst, nullptr);
+				mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL | ES_PASSWORD , 5, 10 + fontSize / 2 + fontSize * linesOfText, InputBox::width - 30, fontSize + 2, _hWnd, nullptr, hInst, nullptr);
 			else
-				hWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL/*ES_PASSWORD*/, 5, 10 + fontSize / 2 + fontSize * linesOfText, InputBox::width - 30, fontSize + 2, hWnd, nullptr, hInst, nullptr);
+				mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL/*ES_PASSWORD*/, 5, 10 + fontSize / 2 + fontSize * linesOfText, InputBox::width - 30, fontSize + 2, _hWnd, nullptr, hInst, nullptr);
 
-			if (hWndEdit == nullptr) {
+			if (mhWndEdit == nullptr) {
 				return (LRESULT)nullptr;
 			}
-			SendMessage((hWndEdit), WM_SETFONT, (WPARAM)hFont, 0);
+			SendMessage((mhWndEdit), WM_SETFONT, (WPARAM)mhFont, 0);
 
-			hWndOK = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Ok"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, InputBox::width - 25 - (fontSize * 120 / 22) * 2 - 20, 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15, fontSize * 120 / 22, fontSize + 8, hWnd, nullptr, hInst, nullptr);
-			if (hWndOK == nullptr) {
+			mhWndOK = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Ok"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, InputBox::width - 25 - (fontSize * 120 / 22) * 2 - 20, 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15, fontSize * 120 / 22, fontSize + 8, _hWnd, nullptr, hInst, nullptr);
+			if (mhWndOK == nullptr) {
 				return (LRESULT)nullptr;
 			}
-			SendMessage((hWndOK), WM_SETFONT, (WPARAM)hFont, 0);
+			SendMessage((mhWndOK), WM_SETFONT, (WPARAM)mhFont, 0);
 
-			hWndCancel = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Cancel"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, InputBox::width - 25 - fontSize * 120 / 22, 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15, fontSize * 120 / 22, fontSize + 8, hWnd, nullptr, hInst, nullptr);
-			if (hWndCancel == nullptr) {
+			mhWndCancel = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Cancel"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, InputBox::width - 25 - fontSize * 120 / 22, 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15, fontSize * 120 / 22, fontSize + 8, _hWnd, nullptr, hInst, nullptr);
+			if (mhWndCancel == nullptr) {
 				return (LRESULT)nullptr;
 			}
-			SendMessage((hWndCancel), WM_SETFONT, (WPARAM)hFont, 0);
+			SendMessage((mhWndCancel), WM_SETFONT, (WPARAM)mhFont, 0);
 
-			hWndPrompt = CreateWindowEx(WS_EX_STATICEDGE, _T("static"), _T(""), WS_VISIBLE | WS_CHILD, 5, 10, InputBox::width - 30, (fontSize + 2) * linesOfText, hWnd, nullptr, hInst, nullptr);
-			if (hWndPrompt == nullptr) {
+			mhWndPrompt = CreateWindowEx(WS_EX_STATICEDGE, _T("static"), _T(""), WS_VISIBLE | WS_CHILD, 5, 10, InputBox::width - 30, (fontSize + 2) * linesOfText, _hWnd, nullptr, hInst, nullptr);
+			if (mhWndPrompt == nullptr) {
 				return (LRESULT)nullptr;
 			}
 
-			SendMessage((hWndPrompt), WM_SETFONT, (WPARAM)hFont, 0);
-			SetFocus(hWndEdit);
+			SendMessage((mhWndPrompt), WM_SETFONT, (WPARAM)mhFont, 0);
+			SetFocus(mhWndEdit);
 			break;
 		}
 		case WM_DESTROY: {
-			DeleteObject(hFont);
-			EnableWindow(hWndParent, TRUE);
-			SetForegroundWindow(hWndParent);
-			DestroyWindow(hWnd);
+			DeleteObject(mhFont);
+			EnableWindow(mhWndParent, TRUE);
+			SetForegroundWindow(mhWndParent);
+			DestroyWindow(_hWnd);
 			PostQuitMessage(0);
 			break;
 		}
 		case WM_COMMAND: {
-			switch (HIWORD(wParam)) {
+			switch (HIWORD(_wParam)) {
 				case BN_CLICKED:
-					if ((HWND)lParam == hWndOK)
-						PostMessage(hWndInputBox, WM_KEYDOWN, VK_RETURN, 0);
-					if ((HWND)lParam == hWndCancel)
-						PostMessage(hWndInputBox, WM_KEYDOWN, VK_ESCAPE, 0);
+					if ((HWND)_lParam == mhWndOK)
+						PostMessage(mhWndInputBox, WM_KEYDOWN, VK_RETURN, 0);
+					if ((HWND)_lParam == mhWndCancel)
+						PostMessage(mhWndInputBox, WM_KEYDOWN, VK_ESCAPE, 0);
 					break;
 			}
 			break;
 		}
 		default: {
-			return DefWindowProc(hWnd, message, wParam, lParam);
+			return DefWindowProc(_hWnd, _message, _wParam, _lParam);
 		}
 	}
 	return 0;
 }
 
-bool InputBox::GetString(wstring &result)
+bool InputBox::GetString(wstring & _result)
 {
 	HWND hWnd = GetDesktopWindow();
 	RECT rc;
@@ -194,55 +194,55 @@ bool InputBox::GetString(wstring &result)
 		}
 	}
 
-	hWndParent = hWnd;
-	hWndInputBox = CreateWindowEx(
+	mhWndParent = hWnd;
+	mhWndInputBox = CreateWindowEx(
 		WS_EX_DLGMODALFRAME, _T("InputBox"), title.c_str(), 
 		WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP | WS_VISIBLE, 
 		(rc.right - InputBox::width) / 2, (rc.bottom - InputBox::width / 2) / 2, 
 		InputBox::width, 50 + 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15 + (fontSize + 8),
-		hWndParent, nullptr, nullptr, nullptr
+		mhWndParent, nullptr, nullptr, nullptr
 	);
-	if (hWndInputBox == nullptr) {
+	if (mhWndInputBox == nullptr) {
 		return false;
 	}
 
-	SetTextAlignment(hWndPrompt, SS_LEFT);
-	SetWindowText(hWndPrompt, prompt.c_str());
-	SetTextAlignment(hWndEdit, SS_LEFT);
-	SetForegroundWindow(hWndInputBox);
+	SetTextAlignment(mhWndPrompt, SS_LEFT);
+	SetWindowText(mhWndPrompt, prompt.c_str());
+	SetTextAlignment(mhWndEdit, SS_LEFT);
+	SetForegroundWindow(mhWndInputBox);
 
-	SendMessage((HWND)hWndOK, BM_SETSTYLE, (WPARAM)LOWORD(BS_DEFPUSHBUTTON), MAKELPARAM(TRUE, 0));
-	SendMessage((HWND)hWndCancel, BM_SETSTYLE, (WPARAM)LOWORD(BS_PUSHBUTTON), MAKELPARAM(TRUE, 0));
-	SendMessage(hWndEdit, EM_SETSEL, 0, -1);
-	SendMessage(hWndEdit, EM_REPLACESEL, 0, (LPARAM)def.c_str());
-	SendMessage(hWndEdit, EM_SETSEL, 0, -1);
-	SetFocus(hWndEdit);
+	SendMessage((HWND)mhWndOK, BM_SETSTYLE, (WPARAM)LOWORD(BS_DEFPUSHBUTTON), MAKELPARAM(TRUE, 0));
+	SendMessage((HWND)mhWndCancel, BM_SETSTYLE, (WPARAM)LOWORD(BS_PUSHBUTTON), MAKELPARAM(TRUE, 0));
+	SendMessage(mhWndEdit, EM_SETSEL, 0, -1);
+	SendMessage(mhWndEdit, EM_REPLACESEL, 0, (LPARAM)def.c_str());
+	SendMessage(mhWndEdit, EM_SETSEL, 0, -1);
+	SetFocus(mhWndEdit);
 
-	EnableWindow(hWndParent, FALSE);
-	ShowWindow(hWndInputBox, SW_SHOW);
-	UpdateWindow(hWndInputBox);
+	EnableWindow(mhWndParent, FALSE);
+	ShowWindow(mhWndInputBox, SW_SHOW);
+	UpdateWindow(mhWndInputBox);
 
 	BOOL ret = false;
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		if (msg.message == WM_KEYDOWN) {
 			if (msg.wParam == VK_ESCAPE) {
-				SendMessage(hWndInputBox, WM_DESTROY, 0, 0);
+				SendMessage(mhWndInputBox, WM_DESTROY, 0, 0);
 				ret = false;
 			} else if (msg.wParam == VK_RETURN) {
-				int nCount = GetWindowTextLengthW(hWndEdit) + 1;
+				int nCount = GetWindowTextLengthW(mhWndEdit) + 1;
 
 				vector<wchar_t> buff(nCount);
-				GetWindowTextW(hWndEdit, &buff[0], nCount);
-				result = &buff[0];
+				GetWindowTextW(mhWndEdit, &buff[0], nCount);
+				_result = &buff[0];
 
-				SendMessage(hWndInputBox, WM_DESTROY, 0, 0);
+				SendMessage(mhWndInputBox, WM_DESTROY, 0, 0);
 				ret = true;
 			} else if (msg.wParam == VK_TAB) {
 				HWND hWndFocused = GetFocus();
-				if (hWndFocused == hWndEdit) SetFocus(hWndOK);
-				if (hWndFocused == hWndOK) SetFocus(hWndCancel);
-				if (hWndFocused == hWndCancel) SetFocus(hWndEdit);
+				if (hWndFocused == mhWndEdit) SetFocus(mhWndOK);
+				if (hWndFocused == mhWndOK) SetFocus(mhWndCancel);
+				if (hWndFocused == mhWndCancel) SetFocus(mhWndEdit);
 			}
 		}
 		TranslateMessage(&msg);
