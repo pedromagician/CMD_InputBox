@@ -12,7 +12,7 @@ UTL_Cmd::~UTL_Cmd()
 
 void UTL_Cmd::Help()
 {
-	_tprintf(_T("InputBox 0.3\n"));
+	_tprintf(_T("InputBox 0.4\n"));
 	_tprintf(_T("	InputBox for command line. Amiga Rulez!\n"));
 	_tprintf(_T("\nUsage:\n"));
 	_tprintf(_T("	InputBox [options]\n"));
@@ -41,7 +41,7 @@ void UTL_Cmd::Add(ARGUMENT_TYPE _type, int _num, ...)
 	va_start(arglist, _num);
 	for (int x = 0; x < argCount; x++) {
 		LPCWSTR tmp = va_arg(arglist, LPCWSTR);
-		arg.text.push_back(tmp);
+		arg.text.push_back(UTL_Conversion::ToLower(UTL_Conversion::TrimWhiteChar(tmp)));
 	}
 	arg.help = va_arg(arglist, LPCWSTR);
 	arg.pVar = static_cast <void*> (va_arg(arglist, void*));
@@ -105,7 +105,7 @@ int UTL_Cmd::ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParamete
 				else if (mArguments[a].type == _ENUM) {
 					i++;
 					if (i < _argc) {
-						wstring key = UTL_Conversion::TrimWhiteChar(_pArgv[i]);
+						wstring key = UTL_Conversion::ToLower(UTL_Conversion::TrimWhiteChar(_pArgv[i]));
 						auto search = mArguments[a].pTable->find(key);
 						if (search != mArguments[a].pTable->end()) {
 							*((UINT*)mArguments[a].pVar) = search->second;
