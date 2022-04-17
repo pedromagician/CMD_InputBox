@@ -12,7 +12,7 @@ UTL_Cmd::~UTL_Cmd()
 
 void UTL_Cmd::Help()
 {
-	_tprintf(_T("InputBox 0.4.1\n"));
+	_tprintf(_T("InputBox 0.4.2\n"));
 	_tprintf(_T("	InputBox for command line. Amiga Rulez!\n"));
 	_tprintf(_T("\nUsage:\n"));
 	_tprintf(_T("	InputBox [options]\n"));

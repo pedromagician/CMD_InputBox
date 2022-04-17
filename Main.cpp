@@ -14,7 +14,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	cmd.Add(UTL_Cmd::_STRING,	2,	_T("-message"),		_T("-m"),				_T("The 'xxx' argument specifies the text of the dialog. A new line can be inserted using \\n."),	&InputBox::prompt);
 	cmd.Add(UTL_Cmd::_STRING,	2,	_T("-default"),		_T("-d"),				_T("The 'xxx' argument specifies the default text of the input field."),							&InputBox::def);
 	cmd.Add(UTL_Cmd::_TRUE,		3,	_T("-help"),		_T("-h"),	_T("-?"),	_T("To view help."),																				&help);
-	cmd.Add(UTL_Cmd::_BOOL,		2,	_T("-password"),	_T("-pass"),			_T("The 'xxx' toggle specifies that the text in the dialog box should be displayed with \"*\" characters, e.g. when entering passwords that should not be visible to the person standing behind the user."),	&InputBox::password);
+	cmd.Add(UTL_Cmd::_TRUE,		2,	_T("-password"),	_T("-pass"),			_T("The toggle specifies that the text in the dialog box should be displayed with \"*\" characters, e.g. when entering passwords that should not be visible to the person standing behind the user."),	&InputBox::password);
 	cmd.Add(UTL_Cmd::_STRING,	2,	_T("-font"),		_T("-f"),				_T("The 'xxx' argument specifies the font of the dialog box."),										&InputBox::fontName);
 	cmd.Add(UTL_Cmd::_INT,		2,	_T("-fontsize"),	_T("-fs"),				_T("The 'xxx' argument specifies the font size of the dialog box."),								&InputBox::fontSize);
 	cmd.Add(UTL_Cmd::_INT,		2,	_T("-lines"),		_T("-l"),				_T("The 'xxx' argument specifies the number of lines of dialogue."),								&InputBox::linesOfText);

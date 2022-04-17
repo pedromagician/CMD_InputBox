@@ -5,7 +5,7 @@
 class UTL_Cmd
 {
 public:
-	enum ARGUMENT_TYPE { _STRING, _TRUE, _BOOL, _INT, _COLOR, _ENUM };
+	enum ARGUMENT_TYPE { _STRING, _TRUE, _INT, _COLOR, _ENUM };
 	struct ARGUMENT {
 		vector<wstring>		text;
 		ARGUMENT_TYPE		type;
