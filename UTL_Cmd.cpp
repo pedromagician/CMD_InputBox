@@ -12,7 +12,7 @@ UTL_Cmd::~UTL_Cmd()
 
 void UTL_Cmd::Help()
 {
-	_tprintf(_T("InputBox 0.4\n"));
+	_tprintf(_T("InputBox 0.4.1\n"));
 	_tprintf(_T("	InputBox for command line. Amiga Rulez!\n"));
 	_tprintf(_T("\nUsage:\n"));
 	_tprintf(_T("	InputBox [options]\n"));
@@ -69,12 +69,6 @@ int UTL_Cmd::ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParamete
 						_correctParameters++;
 						unknown = false;
 					}
-					break;
-				}
-				else if (mArguments[a].type == _BOOL) {
-					*((bool*)mArguments[a].pVar) = !*((bool*)mArguments[a].pVar);
-					_correctParameters++;
-					unknown = false;
 					break;
 				}
 				else if (mArguments[a].type == _TRUE) {
