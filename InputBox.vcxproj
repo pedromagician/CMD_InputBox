@@ -85,16 +85,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="InputBox.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="UTL_Cmd.cpp" />
-    <ClCompile Include="UTL_Conversion.cpp" />
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="Conversion.cpp" />
+    <ClCompile Include="Monitors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputBox.h" />
+    <ClInclude Include="Monitors.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="UTL_Cmd.h" />
-    <ClInclude Include="UTL_Conversion.h" />
+    <ClInclude Include="CommandLine.h" />
+    <ClInclude Include="Conversion.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="project.rc" />

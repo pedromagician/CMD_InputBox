@@ -1,18 +1,18 @@
-﻿#include "UTL_Cmd.h"
-#include "UTL_Conversion.h"
+﻿#include "CommandLine.h"
+#include "Conversion.h"
 
-UTL_Cmd::UTL_Cmd()
+CommandLine::CommandLine()
 {
 	mArguments.clear();
 }
 
-UTL_Cmd::~UTL_Cmd()
+CommandLine::~CommandLine()
 {
 }
 
-void UTL_Cmd::Help()
+void CommandLine::Help()
 {
-	_tprintf(_T("InputBox 0.4.2\n"));
+	_tprintf(_T("InputBox 0.5\n"));
 	_tprintf(_T("	InputBox for command line. Amiga Rulez!\n"));
 	_tprintf(_T("\nUsage:\n"));
 	_tprintf(_T("	InputBox [options]\n"));
@@ -27,7 +27,7 @@ void UTL_Cmd::Help()
 	}
 }
 
-void UTL_Cmd::Add(ARGUMENT_TYPE _type, int _num, ...)
+void CommandLine::Add(ARGUMENT_TYPE _type, int _num, ...)
 {
 	ARGUMENT arg;
 	arg.text.clear();
@@ -41,7 +41,7 @@ void UTL_Cmd::Add(ARGUMENT_TYPE _type, int _num, ...)
 	va_start(arglist, _num);
 	for (int x = 0; x < argCount; x++) {
 		LPCWSTR tmp = va_arg(arglist, LPCWSTR);
-		arg.text.push_back(UTL_Conversion::ToLower(UTL_Conversion::TrimWhiteChar(tmp)));
+		arg.text.push_back(Conversion::ToLower(Conversion::TrimWhiteChar(tmp)));
 	}
 	arg.help = va_arg(arglist, LPCWSTR);
 	arg.pVar = static_cast <void*> (va_arg(arglist, void*));
@@ -52,19 +52,19 @@ void UTL_Cmd::Add(ARGUMENT_TYPE _type, int _num, ...)
 	mArguments.push_back(arg);
 }
 
-int UTL_Cmd::ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParameters)
+int CommandLine::ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParameters)
 {
 	_correctParameters = 0;
 
 	for (int i = 1; i < _argc; i++) {
 		bool unknown = true;
 		for (unsigned int a = 0; a < mArguments.size(); a++) {
-			if (find(mArguments[a].text.begin(), mArguments[a].text.end(), UTL_Conversion::TrimWhiteChar(_pArgv[i])) != mArguments[a].text.end()) {
+			if (find(mArguments[a].text.begin(), mArguments[a].text.end(), Conversion::TrimWhiteChar(_pArgv[i])) != mArguments[a].text.end()) {
 				if (mArguments[a].type == _STRING) {
 					i++;
 					if (i < _argc) {
-						wstring tmp = UTL_Conversion::TrimWhiteChar(_pArgv[i]);
-						UTL_Conversion::StringReplaceAll(tmp, _T("\\n"), _T("\n"));
+						wstring tmp = Conversion::TrimWhiteChar(_pArgv[i]);
+						Conversion::StringReplaceAll(tmp, _T("\\n"), _T("\n"));
 						*((wstring*)mArguments[a].pVar) = tmp;
 						_correctParameters++;
 						unknown = false;
@@ -80,7 +80,7 @@ int UTL_Cmd::ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParamete
 				else if (mArguments[a].type == _INT) {
 					i++;
 					if (i < _argc) {
-						*((int*)mArguments[a].pVar) = UTL_Conversion::ToInt(UTL_Conversion::TrimWhiteChar(_pArgv[i]));
+						*((int*)mArguments[a].pVar) = Conversion::ToInt(Conversion::TrimWhiteChar(_pArgv[i]));
 						_correctParameters++;
 						unknown = false;
 					}
@@ -90,7 +90,7 @@ int UTL_Cmd::ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParamete
 					i++;
 					if (i < _argc) {
 						((pair<bool, wstring>*)mArguments[a].pVar)->first = true;
-						((pair<bool, wstring>*)mArguments[a].pVar)->second = UTL_Conversion::TrimWhiteChar(_pArgv[i]);
+						((pair<bool, wstring>*)mArguments[a].pVar)->second = Conversion::TrimWhiteChar(_pArgv[i]);
 						_correctParameters++;
 						unknown = false;
 					}
@@ -99,7 +99,7 @@ int UTL_Cmd::ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParamete
 				else if (mArguments[a].type == _ENUM) {
 					i++;
 					if (i < _argc) {
-						wstring key = UTL_Conversion::ToLower(UTL_Conversion::TrimWhiteChar(_pArgv[i]));
+						wstring key = Conversion::ToLower(Conversion::TrimWhiteChar(_pArgv[i]));
 						auto search = mArguments[a].pTable->find(key);
 						if (search != mArguments[a].pTable->end()) {
 							*((UINT*)mArguments[a].pVar) = search->second;

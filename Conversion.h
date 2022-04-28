@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 
-class UTL_Conversion {
+class Conversion {
 public:
 	static int ToInt(const wstring& _buff, int _base = 10);
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "InputBox.h"
-#include "UTL_Conversion.h"
+#include "Conversion.h"
+#include "Monitors.h"
 
 HFONT	InputBox::mhFont		= nullptr;
 HWND	InputBox::mhWndParent	= nullptr;
@@ -24,6 +25,8 @@ wstring InputBox::def					= _T("");
 pair<bool, wstring>	InputBox::brush		= pair<bool, wstring>(false, _T("#000000"));
 pair<bool, wstring> InputBox::background= pair<bool, wstring>(false, _T("#000000"));
 pair<bool, wstring> InputBox::pen		= pair<bool, wstring>(false, _T("#ffffff"));
+
+struct InputBox::InformationAboutPositionOfInputBox InputBox::position;
 
 void InputBox::SetTextAlignment(HWND _hwnd, int _textAlignment)
 {
@@ -74,19 +77,19 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 			int r = 0, g = 0, b = 0;
 			if (brush.first) {
 				if (mhbrBkgnd == nullptr) {
-					UTL_Conversion::HexToRGB(brush.second, r, g, b);
+					Conversion::HexToRGB(brush.second, r, g, b);
 					mhbrBkgnd = CreateSolidBrush(RGB(r, g, b));
 				}
 			}
 
 			HDC hdcStatic = (HDC)_wParam;
 			if (pen.first) {
-				UTL_Conversion::HexToRGB(pen.second, r, g, b);
+				Conversion::HexToRGB(pen.second, r, g, b);
 				SetTextColor(hdcStatic, RGB(r, g, b));
 			}
 
 			if (background.first) {
-				UTL_Conversion::HexToRGB(background.second, r, g, b);
+				Conversion::HexToRGB(background.second, r, g, b);
 				SetBkColor(hdcStatic, RGB(r, g, b));
 			}
 
@@ -137,6 +140,102 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 			SendMessage((mhWndPrompt), WM_SETFONT, (WPARAM)mhFont, 0);
 			SetFocus(mhWndEdit);
+
+			RECT dialogRect;
+			GetWindowRect(_hWnd, &dialogRect);
+
+			bool monitor = true;
+			RECT monitorSize = { 0 };
+
+			switch (InputBox::position.monitor) {
+			case _PRIMARY:
+				monitor = Monitors::GetMonitorInfoPrimary(monitorSize);
+				break;
+			case _MOUSE:
+				monitor = Monitors::GetMonitorInfoMouse(monitorSize);
+				break;
+			case _MOUSE_POINTER:
+				monitor = Monitors::GetMonitorInfoMouse(monitorSize);
+				InputBox::position.type = _POINTER;
+				break;
+			case _ID:
+				monitor = Monitors::GetMonitorInfoId(InputBox::position.id, monitorSize);
+				break;
+			}
+
+			if (InputBox::position.type == _POINTER) {
+				RECT mouseMonitorSize = { 0 };
+				monitor = Monitors::GetMonitorInfoMouse(mouseMonitorSize);
+				if (EqualRect(&mouseMonitorSize, &monitorSize) == false) {
+					InputBox::position.type = _CENTER;
+				}
+			}
+
+			long x = 0;
+			long y = 0;
+			if (monitor) {
+				switch (InputBox::position.type) {
+				case _CENTER: {
+					x = GetDiameterX(monitorSize) - GetWidth(dialogRect) / 2;
+					y = GetDiameterY(monitorSize) - GetHeight(dialogRect) / 2;
+					break;
+				}
+				case _XY: {
+					x = monitorSize.left;
+					y = monitorSize.top;
+					break;
+				}
+				case _TOP_CENTER: {
+					x = GetDiameterX(monitorSize) - GetWidth(dialogRect) / 2;
+					y = monitorSize.top;
+					break;
+				}
+				case _BOTTOM_CENTER: {
+					x = GetDiameterX(monitorSize) - GetWidth(dialogRect) / 2;
+					y = monitorSize.bottom - GetHeight(dialogRect);
+					break;
+				}
+				case _LEFT_CENTER: {
+					x = monitorSize.left;
+					y = GetDiameterY(monitorSize) - GetHeight(dialogRect) / 2;
+					break;
+				}
+				case _RIGHT_CENTER: {
+					x = monitorSize.right - GetWidth(dialogRect);
+					y = GetDiameterY(monitorSize) - GetHeight(dialogRect) / 2;
+					break;
+				}
+				case _POINTER: {
+					POINT mouse;
+					::GetCursorPos(&mouse);
+
+					x = mouse.x - GetWidth(dialogRect) / 2;
+					y = mouse.y - GetHeight(dialogRect) / 2;
+
+					break;
+				}
+				default:
+					_tprintf(wstring(_T("Error - unknown position: ") + to_wstring(InputBox::position.type) + _T("\n")).c_str());
+					InputBox::position.type = _CENTER;
+					monitor = Monitors::GetMonitorInfoPrimary(monitorSize);
+					x = GetDiameterX(monitorSize) - GetWidth(dialogRect) / 2;
+					y = GetDiameterY(monitorSize) - GetHeight(dialogRect) / 2;
+					break;
+				}
+			}
+			else {
+				_tprintf(wstring(_T("Error - problem loading information from the monitor")).c_str());
+				InputBox::position.monitor = _PRIMARY;
+				InputBox::position.type = _XY;
+				x = monitorSize.left;
+				y = monitorSize.top;
+			}
+
+			x += InputBox::position.delta.x;
+			y += InputBox::position.delta.y;
+
+			SetWindowPos(_hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
+
 			break;
 		}
 		case WM_DESTROY: {
@@ -251,3 +350,22 @@ bool InputBox::GetString(wstring & _result)
 	return ret;
 }
 
+long InputBox::GetDiameterX(RECT _rect)
+{
+	return _rect.left + (_rect.right - _rect.left) / 2;
+}
+
+long InputBox::GetDiameterY(RECT _rect)
+{
+	return _rect.top + (_rect.bottom - _rect.top) / 2;
+}
+
+long InputBox::GetWidth(RECT _rect)
+{
+	return (_rect.right - _rect.left);
+}
+
+long InputBox::GetHeight(RECT _rect)
+{
+	return (_rect.bottom - _rect.top);
+}

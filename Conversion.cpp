@@ -1,13 +1,13 @@
-﻿#include "UTL_conversion.h"
+﻿#include "conversion.h"
 
 #define WHITE_SPACE_CHARACTERS _T(" \t\n\v\f\r ")
 
-int UTL_Conversion::ToInt(const wstring& _buff, int _base)
+int Conversion::ToInt(const wstring& _buff, int _base)
 {
 	return _tcstol(_buff.c_str(), nullptr, _base);
 }
 
-wstring UTL_Conversion::LeftTrimString(wstring _str, const wstring& _val)
+wstring Conversion::LeftTrimString(wstring _str, const wstring& _val)
 {
 	wstring::size_type pos = _str.find_first_not_of(_val);
 	if (pos != wstring::npos)
@@ -18,7 +18,7 @@ wstring UTL_Conversion::LeftTrimString(wstring _str, const wstring& _val)
 	return _str;
 }
 
-wstring UTL_Conversion::RightTrimString(wstring _str, const wstring& _val)
+wstring Conversion::RightTrimString(wstring _str, const wstring& _val)
 {
 	wstring::size_type pos = _str.find_last_not_of(_val);
 	if (pos != wstring::npos)
@@ -29,7 +29,7 @@ wstring UTL_Conversion::RightTrimString(wstring _str, const wstring& _val)
 	return _str;
 }
 
-wstring UTL_Conversion::TrimString(wstring _str, const wstring& _val)
+wstring Conversion::TrimString(wstring _str, const wstring& _val)
 {
 	wstring::size_type pos = _str.find_last_not_of(_val);
 	if (pos != wstring::npos)
@@ -45,18 +45,18 @@ wstring UTL_Conversion::TrimString(wstring _str, const wstring& _val)
 	return _str;
 }
 
-wstring UTL_Conversion::TrimWhiteChar(const wstring& _val)
+wstring Conversion::TrimWhiteChar(const wstring& _val)
 {
 	return TrimString(_val, WHITE_SPACE_CHARACTERS);
 }
 
-wstring UTL_Conversion::ToLower(wstring _val)
+wstring Conversion::ToLower(wstring _val)
 {
 	transform(_val.begin(), _val.end(), _val.begin(), [](wchar_t c) { return towlower(c); });
 	return _val;
 }
 
-void UTL_Conversion::StringReplaceAll(wstring& _mess, const wstring& _oldStr, const wstring& _newStr)
+void Conversion::StringReplaceAll(wstring& _mess, const wstring& _oldStr, const wstring& _newStr)
 {
 	const size_t oldLen = _oldStr.length();
 	const size_t newLen = _newStr.length();
@@ -68,7 +68,7 @@ void UTL_Conversion::StringReplaceAll(wstring& _mess, const wstring& _oldStr, co
 	}
 }
 
-void UTL_Conversion::HexToRGB(wstring _hex, int& _r, int& _g, int& _b)
+void Conversion::HexToRGB(wstring _hex, int& _r, int& _g, int& _b)
 {
 	_hex = TrimWhiteChar(_hex);
 	_hex = LeftTrimString(_hex, _T("#"));

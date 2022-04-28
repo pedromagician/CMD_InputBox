@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 
-class UTL_Cmd
+class CommandLine
 {
 public:
 	enum ARGUMENT_TYPE { _STRING, _TRUE, _INT, _COLOR, _ENUM };
@@ -39,8 +39,8 @@ private:
 	vector<ARGUMENT> mArguments;
 
 public:
-	UTL_Cmd();
-	~UTL_Cmd();
+	CommandLine();
+	~CommandLine();
 	void Add(ARGUMENT_TYPE _type, int _num, ...);
 
 	int ParseCommandLine(int _argc, _TCHAR* _pArgv[], int& _correctParameters);
