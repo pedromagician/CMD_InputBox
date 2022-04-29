@@ -12,7 +12,7 @@ CommandLine::~CommandLine()
 
 void CommandLine::Help()
 {
-	_tprintf(_T("InputBox 0.5\n"));
+	_tprintf(_T("InputBox 0.5.1\n"));
 	_tprintf(_T("	InputBox for command line. Amiga Rulez!\n"));
 	_tprintf(_T("\nUsage:\n"));
 	_tprintf(_T("	InputBox [options]\n"));

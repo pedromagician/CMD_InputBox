@@ -10,9 +10,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	int correctParameters = 0;
 	bool help = false;
 	wstring monitor = _T("primary");
-	wstring position = _T("center");
-	int deltaX = 0;
-	int deltaY = 0;
+
+	map<wstring, UINT> string2positionType{
+		{_T("center"),	InputBox::_CENTER},
+		{_T("top"),		InputBox::_TOP_CENTER},
+		{_T("bottom"),	InputBox::_BOTTOM_CENTER},
+		{_T("left"),	InputBox::_LEFT_CENTER},
+		{_T("right"),	InputBox::_RIGHT_CENTER},
+		{_T("pointer"),	InputBox::_POINTER},
+		{_T("xy"),		InputBox::_XY},
+	};
+
+	InputBox::position.monitor	= InputBox::_PRIMARY;
+	InputBox::position.id		= 0;
+	InputBox::position.type		= InputBox::_CENTER;
+	InputBox::position.delta	= { 0, 0 };
 
 	CommandLine cmd;
 	cmd.Add(CommandLine::_STRING,	2,	_T("-title"),		_T("-t"),				_T("The 'xxx' argument specifies the name of the dialog."),											&InputBox::title);
@@ -28,9 +40,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	cmd.Add(CommandLine::_COLOR,	2,	_T("-background"),	_T("-b"),				_T("The 'xxx' argument specifies the background color."),											&InputBox::background);
 	cmd.Add(CommandLine::_COLOR,	2,	_T("-brush"),		_T("-br"),				_T("The 'xxx' argument determines the brush."),														&InputBox::brush);
 	cmd.Add(CommandLine::_STRING,	2,	_T("-monitor"),		_T("-mon"),				_T("The 'xxx' argument specifies the default monitor. Allowed options: Primary|Mouse|MousePointer|0|1|2|n."),		&monitor);
-	cmd.Add(CommandLine::_STRING,	2,	_T("-position"),	_T("-pos"),				_T("The 'xxx' argument specifies the default position. Allowed options: Center|Top|Bottom|Left|Right|Pointer|xy."), &position);
-	cmd.Add(CommandLine::_INT,		1,	_T("-x"),									_T("The 'xxx' argument specifies the position offset along the X coordinate."),										&deltaX);
-	cmd.Add(CommandLine::_INT,		1,	_T("-y"),									_T("The 'xxx' argument specifies the position offset along the Y coordinate."),										&deltaY);
+	cmd.Add(CommandLine::_ENUM,		2,	_T("-position"),	_T("-pos"),				_T("The 'xxx' argument specifies the default position. Allowed options: Center|Top|Bottom|Left|Right|Pointer|xy."), &InputBox::position.type,	&string2positionType);
+	cmd.Add(CommandLine::_INT,		1,	_T("-x"),									_T("The 'xxx' argument specifies the position offset along the X coordinate."),						&InputBox::position.delta.x);
+	cmd.Add(CommandLine::_INT,		1,	_T("-y"),									_T("The 'xxx' argument specifies the position offset along the Y coordinate."),						&InputBox::position.delta.y);
 
 	if (cmd.ParseCommandLine(argc, argv, correctParameters) != 0) {
 		cmd.Help();
@@ -47,11 +59,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		return 1;
 	}
 
-	InputBox::position.monitor	= InputBox::_PRIMARY;
-	InputBox::position.id		= 0;
-	InputBox::position.type		= InputBox::_CENTER;
-	InputBox::position.delta	= { 0, 0 };
-
 	monitor = Conversion::ToLower(Conversion::TrimWhiteChar(monitor));
 	if (monitor == _T("primary"))			InputBox::position.monitor = InputBox::_PRIMARY;
 	else if (monitor == _T("mouse"))		InputBox::position.monitor = InputBox::_MOUSE;
@@ -60,17 +67,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		InputBox::position.monitor = InputBox::_ID;
 		InputBox::position.id = (UINT)Conversion::ToInt(monitor);
 	}
-
-	position = Conversion::ToLower(Conversion::TrimWhiteChar(position));
-	if (position == _T("center"))		InputBox::position.type = InputBox::_CENTER;
-	else if (position == _T("top"))		InputBox::position.type = InputBox::_TOP_CENTER;
-	else if (position == _T("bottom"))	InputBox::position.type = InputBox::_BOTTOM_CENTER;
-	else if (position == _T("left"))	InputBox::position.type = InputBox::_LEFT_CENTER;
-	else if (position == _T("right"))	InputBox::position.type = InputBox::_RIGHT_CENTER;
-	else if (position == _T("pointer"))	InputBox::position.type = InputBox::_POINTER;
-	else if (position == _T("xy"))		InputBox::position.type = InputBox::_XY;
-
-	InputBox::position.delta = { deltaX, deltaY };
 
 	wstring result = _T("");
 	if (InputBox::GetString(result) == 0)
