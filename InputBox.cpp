@@ -111,36 +111,43 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 			hInst = GetModuleHandle(nullptr);
 
-			if (InputBox::password)
-				mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL | ES_PASSWORD , 5, 10 + fontSize / 2 + fontSize * linesOfText, InputBox::width - 30, fontSize + 2, _hWnd, nullptr, hInst, nullptr);
-			else
-				mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL/*ES_PASSWORD*/, 5, 10 + fontSize / 2 + fontSize * linesOfText, InputBox::width - 30, fontSize + 2, _hWnd, nullptr, hInst, nullptr);
+			// input
+			int inputX = 5;
+			int inputY = 10 + fontSize / 2 + fontSize * linesOfText;
+			int inputWidth = InputBox::width - 30;
+			int inputHeight = fontSize + 2;
 
-			if (mhWndEdit == nullptr) {
-				return (LRESULT)nullptr;
-			}
+			if (InputBox::password)	mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL | ES_PASSWORD , inputX, inputY, inputWidth, inputHeight, _hWnd, nullptr, hInst, nullptr);
+			else					mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL/*ES_PASSWORD*/, inputX, inputY, inputWidth, inputHeight, _hWnd, nullptr, hInst, nullptr);
+			if (mhWndEdit == nullptr) return (LRESULT)nullptr;
 			SendMessage((mhWndEdit), WM_SETFONT, (WPARAM)mhFont, 0);
 
-			mhWndOK = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Ok"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, InputBox::width - 25 - (fontSize * 120 / 22) * 2 - 20, 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15, fontSize * 120 / 22, fontSize + 8, _hWnd, nullptr, hInst, nullptr);
-			if (mhWndOK == nullptr) {
-				return (LRESULT)nullptr;
-			}
+			// buttons
+			int buttonWidth = fontSize * 120 / 22;
+			int buttonHeight = fontSize + 8;
+			int buttonX = InputBox::width - 25 - buttonWidth * 2 - 10 - 20;
+			int buttonY = inputY + inputHeight + 15;
+
+			mhWndOK = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Ok"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, buttonX, buttonY, buttonWidth, buttonHeight, _hWnd, nullptr, hInst, nullptr);
+			if (mhWndOK == nullptr) return (LRESULT)nullptr;
 			SendMessage((mhWndOK), WM_SETFONT, (WPARAM)mhFont, 0);
 
-			mhWndCancel = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Cancel"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, InputBox::width - 25 - fontSize * 120 / 22, 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15, fontSize * 120 / 22, fontSize + 8, _hWnd, nullptr, hInst, nullptr);
-			if (mhWndCancel == nullptr) {
-				return (LRESULT)nullptr;
-			}
+			buttonX = InputBox::width - 25 - buttonWidth * 1 - 10;
+
+			mhWndCancel = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Cancel"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, buttonX, buttonY, buttonWidth, buttonHeight, _hWnd, nullptr, hInst, nullptr);
+			if (mhWndCancel == nullptr) return (LRESULT)nullptr;
 			SendMessage((mhWndCancel), WM_SETFONT, (WPARAM)mhFont, 0);
 
-			mhWndPrompt = CreateWindowEx(WS_EX_STATICEDGE, _T("static"), _T(""), WS_VISIBLE | WS_CHILD, 5, 10, InputBox::width - 30, (fontSize + 2) * linesOfText, _hWnd, nullptr, hInst, nullptr);
-			if (mhWndPrompt == nullptr) {
-				return (LRESULT)nullptr;
-			}
-
+			// message
+			int messageX = 5;
+			int messageY = 10;
+			mhWndPrompt = CreateWindowEx(NULL, _T("static"), _T(""), WS_VISIBLE | WS_CHILD, messageX, messageY, inputWidth, fontSize * linesOfText, _hWnd, nullptr, hInst, nullptr);
+			if (mhWndPrompt == nullptr) return (LRESULT)nullptr;
 			SendMessage((mhWndPrompt), WM_SETFONT, (WPARAM)mhFont, 0);
+
 			SetFocus(mhWndEdit);
 
+			// position
 			RECT dialogRect;
 			GetWindowRect(_hWnd, &dialogRect);
 
@@ -293,12 +300,18 @@ bool InputBox::GetString(wstring & _result)
 		}
 	}
 
+	// window
 	mhWndParent = hWnd;
+	int inputY = 10 + fontSize / 2 + fontSize * linesOfText;
+	int inputHeight = fontSize + 2;
+	int buttonY = inputY + inputHeight + 15;
+	int buttonHeight = fontSize + 8;
+
 	mhWndInputBox = CreateWindowEx(
 		WS_EX_DLGMODALFRAME, _T("InputBox"), title.c_str(), 
 		WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP | WS_VISIBLE, 
 		(rc.right - InputBox::width) / 2, (rc.bottom - InputBox::width / 2) / 2, 
-		InputBox::width, 50 + 10 + fontSize / 2 + fontSize * linesOfText + (fontSize + 2) + 15 + (fontSize + 8),
+		InputBox::width, 50 + buttonY + buttonHeight,
 		mhWndParent, nullptr, nullptr, nullptr
 	);
 	if (mhWndInputBox == nullptr) {
@@ -310,7 +323,7 @@ bool InputBox::GetString(wstring & _result)
 	SetTextAlignment(mhWndEdit, SS_LEFT);
 	SetForegroundWindow(mhWndInputBox);
 
-	SendMessage((HWND)mhWndOK, BM_SETSTYLE, (WPARAM)LOWORD(BS_DEFPUSHBUTTON), MAKELPARAM(TRUE, 0));
+	SendMessage((HWND)mhWndOK, BM_SETSTYLE, (WPARAM)LOWORD(BS_PUSHBUTTON), MAKELPARAM(TRUE, 0));
 	SendMessage((HWND)mhWndCancel, BM_SETSTYLE, (WPARAM)LOWORD(BS_PUSHBUTTON), MAKELPARAM(TRUE, 0));
 	SendMessage(mhWndEdit, EM_SETSEL, 0, -1);
 	SendMessage(mhWndEdit, EM_REPLACESEL, 0, (LPARAM)def.c_str());
