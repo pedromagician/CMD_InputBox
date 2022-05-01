@@ -69,9 +69,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	wstring result = _T("");
-	if (InputBox::GetString(result) == 0)
-		return 1;
+	if (InputBox::GetString(result) != 0)
+		_tprintf(result.c_str());
 
-	_tprintf(result.c_str());
 	return 0;
 }
