@@ -7,6 +7,8 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	_setmode(_fileno(stdout), _O_U8TEXT);
+
 	int correctParameters = 0;
 	bool help = false;
 	wstring monitor = _T("primary");
@@ -55,7 +57,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	if (InputBox::prompt.empty()) {
-		_tprintf(_T("Error - message is emnpty\n"));
+		wcout << _T("Error - message is emnpty") << endl;
 		return 1;
 	}
 
@@ -69,8 +71,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	wstring result = _T("");
-	if (InputBox::GetString(result) != 0)
-		_tprintf(result.c_str());
+	if (InputBox::GetString(result) != 0) {
+		wcout << result;
+	}
 
 	return 0;
 }

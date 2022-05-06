@@ -222,7 +222,7 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 					break;
 				}
 				default:
-					_tprintf(wstring(_T("Error - unknown position: ") + to_wstring(InputBox::position.type) + _T("\n")).c_str());
+					wcout << _T("Error - unknown position: ") << to_wstring(InputBox::position.type) << endl;
 					InputBox::position.type = _CENTER;
 					monitor = Monitors::GetMonitorInfoPrimary(monitorSize);
 					x = GetDiameterX(monitorSize) - GetWidth(dialogRect) / 2;
@@ -231,7 +231,7 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 				}
 			}
 			else {
-				_tprintf(wstring(_T("Error - problem loading information from the monitor")).c_str());
+				wcout << _T("Error - problem loading information from the monitor") << endl;
 				InputBox::position.monitor = _PRIMARY;
 				InputBox::position.type = _XY;
 				x = monitorSize.left;
@@ -273,9 +273,9 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 bool InputBox::GetString(wstring & _result)
 {
-	HWND hWnd = GetDesktopWindow();
+	mhWndParent = GetActiveWindow();
 	RECT rc;
-	GetWindowRect(hWnd, &rc);
+	GetWindowRect(mhWndParent, &rc);
 
 	HINSTANCE hInst = GetModuleHandle(nullptr);
 	WNDCLASSEX wcex;
@@ -295,13 +295,12 @@ bool InputBox::GetString(wstring & _result)
 		wcex.hIconSm = nullptr;
 
 		if (RegisterClassEx(&wcex) == 0) {
-			_tprintf(_T("Error - register class\n"));
+			wcout << _T("Error - register class") << endl;
 			return false;
 		}
 	}
 
 	// window
-	mhWndParent = hWnd;
 	int inputY = 10 + fontSize / 2 + fontSize * linesOfText;
 	int inputHeight = fontSize + 2;
 	int buttonY = inputY + inputHeight + 15;
