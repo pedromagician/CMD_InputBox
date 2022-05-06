@@ -274,6 +274,11 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 bool InputBox::GetString(wstring & _result)
 {
 	mhWndParent = GetActiveWindow();
+	if (!mhWndParent)
+		mhWndParent = GetForegroundWindow();
+	if (!mhWndParent)
+		mhWndParent = GetDesktopWindow();
+
 	RECT rc;
 	GetWindowRect(mhWndParent, &rc);
 

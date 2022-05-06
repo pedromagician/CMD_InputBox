@@ -12,7 +12,7 @@ CommandLine::~CommandLine()
 
 void CommandLine::Help()
 {
-	wcout << _T("InputBox 0.5.4") << endl;
+	wcout << _T("InputBox 0.5.6") << endl;
 	wcout << _T("	InputBox for command line. Amiga Rulez!") << endl << endl;
 	wcout << _T("Usage:") << endl;
 	wcout << _T("	InputBox [options]") << endl << endl;
