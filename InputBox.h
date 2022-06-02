@@ -32,6 +32,7 @@ public:
 	static int linesOfText;
 	static bool password;
 	static wstring fontName;
+	static bool topMost;
 
 	static pair<bool, wstring> brush;
 	static pair<bool, wstring> background;

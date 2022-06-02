@@ -17,6 +17,7 @@ int		InputBox::fontSize				= 22;
 int		InputBox::linesOfText			= 1;
 bool	InputBox::password				= false;
 wstring	InputBox::fontName				= _T("Consolas");
+bool	InputBox::topMost				= false;
 
 wstring InputBox::title					= _T("Input Box");
 wstring InputBox::prompt				= _T("Please input text");
@@ -241,7 +242,12 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 			x += InputBox::position.delta.x;
 			y += InputBox::position.delta.y;
 
-			SetWindowPos(_hWnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
+
+			UINT flags = SWP_NOSIZE | SWP_SHOWWINDOW;
+			if (InputBox::topMost == false)
+				flags |= SWP_NOZORDER;
+
+			SetWindowPos(_hWnd, HWND_TOPMOST, x, y, 0, 0, flags);
 
 			break;
 		}
