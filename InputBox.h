@@ -42,6 +42,8 @@ public:
 	static wstring prompt;
 	static wstring def;
 
+	static wstring iconApp;
+
 	static bool GetString(wstring& _result);
 
 private:

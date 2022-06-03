@@ -23,6 +23,8 @@ wstring InputBox::title					= _T("Input Box");
 wstring InputBox::prompt				= _T("Please input text");
 wstring InputBox::def					= _T("");
 
+wstring InputBox::iconApp				= _T("");
+
 pair<bool, wstring>	InputBox::brush		= pair<bool, wstring>(false, _T("#000000"));
 pair<bool, wstring> InputBox::background= pair<bool, wstring>(false, _T("#000000"));
 pair<bool, wstring> InputBox::pen		= pair<bool, wstring>(false, _T("#ffffff"));
@@ -249,6 +251,31 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 			SetWindowPos(_hWnd, HWND_TOPMOST, x, y, 0, 0, flags);
 
+			// icon app
+			if (InputBox::iconApp.empty() == false) {
+				HICON hIcon = nullptr;
+				hIcon = (HICON)LoadImage(hInst, InputBox::iconApp.c_str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+				if (!hIcon) {
+					HBITMAP bitmapForIconApp = nullptr;
+					bitmapForIconApp = (HBITMAP)LoadImage(hInst, InputBox::iconApp.c_str(), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+					if (bitmapForIconApp) {
+						ICONINFO ii = { 0 };
+						ii.fIcon = TRUE;
+						ii.hbmColor = bitmapForIconApp;
+						ii.hbmMask = bitmapForIconApp;
+
+						hIcon = ::CreateIconIndirect(&ii);
+
+						::DeleteObject(bitmapForIconApp);
+					}
+				}
+
+				if (hIcon) {
+					SendMessage(_hWnd, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)hIcon);
+					SendMessage(_hWnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)hIcon);
+				}
+			}
+
 			break;
 		}
 		case WM_DESTROY: {
@@ -322,7 +349,7 @@ bool InputBox::GetString(wstring & _result)
 		WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP | WS_VISIBLE, 
 		(rc.right - InputBox::width) / 2, (rc.bottom - InputBox::width / 2) / 2, 
 		InputBox::width, 50 + buttonY + buttonHeight,
-		mhWndParent, nullptr, nullptr, nullptr
+		/*mhWndParent*/ nullptr, nullptr, nullptr, nullptr
 	);
 	if (mhWndInputBox == nullptr) {
 		return false;
@@ -340,7 +367,7 @@ bool InputBox::GetString(wstring & _result)
 	SendMessage(mhWndEdit, EM_SETSEL, 0, -1);
 	SetFocus(mhWndEdit);
 
-	EnableWindow(mhWndParent, FALSE);
+	//EnableWindow(mhWndParent, FALSE);
 	ShowWindow(mhWndInputBox, SW_SHOW);
 	UpdateWindow(mhWndInputBox);
 
