@@ -33,6 +33,7 @@ public:
 	static bool password;
 	static wstring fontName;
 	static bool topMost;
+	static bool blockParent;
 
 	static pair<bool, wstring> brush;
 	static pair<bool, wstring> background;

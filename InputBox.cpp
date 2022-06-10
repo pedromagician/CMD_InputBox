@@ -18,6 +18,7 @@ int		InputBox::linesOfText			= 1;
 bool	InputBox::password				= false;
 wstring	InputBox::fontName				= _T("Consolas");
 bool	InputBox::topMost				= false;
+bool	InputBox::blockParent			= false;
 
 wstring InputBox::title					= _T("Input Box");
 wstring InputBox::prompt				= _T("Please input text");
@@ -344,12 +345,16 @@ bool InputBox::GetString(wstring & _result)
 	int buttonY = inputY + inputHeight + 15;
 	int buttonHeight = fontSize + 8;
 
+	HWND parent = nullptr;
+	if (InputBox::blockParent)
+		parent = mhWndParent;
+
 	mhWndInputBox = CreateWindowEx(
 		WS_EX_DLGMODALFRAME, _T("InputBox"), title.c_str(), 
 		WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP | WS_VISIBLE, 
 		(rc.right - InputBox::width) / 2, (rc.bottom - InputBox::width / 2) / 2, 
 		InputBox::width, 50 + buttonY + buttonHeight,
-		/*mhWndParent*/ nullptr, nullptr, nullptr, nullptr
+		parent, nullptr, nullptr, nullptr
 	);
 	if (mhWndInputBox == nullptr) {
 		return false;

@@ -47,6 +47,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	cmd.Add(CommandLine::_INT,		1,	_T("-y"),									_T("The 'xxx' argument specifies the position offset along the Y coordinate."),						&InputBox::position.delta.y);
 	cmd.Add(CommandLine::_TRUE,		1,	_T("-topmost"),								_T("This argument places the window above all windows that are not in the highest position.The window retains its highest position even if it is deactivated."),	&InputBox::topMost);
 	cmd.Add(CommandLine::_STRING,	1,	_T("-iconapp"),								_T("The 'xxx' argument specifies the icon file for the application. (ICO/BMP)"),					&InputBox::iconApp);
+	cmd.Add(CommandLine::_TRUE,		1,	_T("-block"),								_T("This argument blocks the parent process that started the InputBox."),							&InputBox::blockParent);
 
 	if (cmd.ParseCommandLine(argc, argv, correctParameters) != 0) {
 		cmd.Help();
