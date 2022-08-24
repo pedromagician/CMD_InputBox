@@ -349,15 +349,26 @@ bool InputBox::GetString(wstring & _result)
 	if (InputBox::blockParent)
 		parent = mhWndParent;
 
+	DWORD dwStyle = WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP | WS_VISIBLE;
+	dwStyle = dwStyle & ~WS_MAXIMIZEBOX;
+	dwStyle = dwStyle & ~WS_MINIMIZEBOX;
+
 	mhWndInputBox = CreateWindowEx(
-		WS_EX_DLGMODALFRAME, _T("InputBox"), title.c_str(), 
-		WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP | WS_VISIBLE, 
+		WS_EX_DLGMODALFRAME, _T("InputBox"), InputBox::title.c_str(), dwStyle,
 		(rc.right - InputBox::width) / 2, (rc.bottom - InputBox::width / 2) / 2, 
 		InputBox::width, 50 + buttonY + buttonHeight,
 		parent, nullptr, nullptr, nullptr
 	);
 	if (mhWndInputBox == nullptr) {
 		return false;
+	}
+
+	HMENU pSysMenu = GetSystemMenu(mhWndInputBox, FALSE);
+	if (pSysMenu) {
+		RemoveMenu(pSysMenu, SC_RESTORE, MF_BYCOMMAND);
+		RemoveMenu(pSysMenu, SC_SIZE, MF_BYCOMMAND);
+		RemoveMenu(pSysMenu, SC_MINIMIZE, MF_BYCOMMAND);
+		RemoveMenu(pSysMenu, SC_MAXIMIZE, MF_BYCOMMAND);
 	}
 
 	SetTextAlignment(mhWndPrompt, SS_LEFT);
@@ -376,13 +387,13 @@ bool InputBox::GetString(wstring & _result)
 	ShowWindow(mhWndInputBox, SW_SHOW);
 	UpdateWindow(mhWndInputBox);
 
-	BOOL ret = false;
+	BOOL returnCode = false;
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		if (msg.message == WM_KEYDOWN) {
 			if (msg.wParam == VK_ESCAPE) {
 				SendMessage(mhWndInputBox, WM_DESTROY, 0, 0);
-				ret = false;
+				returnCode = false;
 			} else if (msg.wParam == VK_RETURN) {
 				int nCount = GetWindowTextLengthW(mhWndEdit) + 1;
 
@@ -391,7 +402,7 @@ bool InputBox::GetString(wstring & _result)
 				_result = &buff[0];
 
 				SendMessage(mhWndInputBox, WM_DESTROY, 0, 0);
-				ret = true;
+				returnCode = true;
 			} else if (msg.wParam == VK_TAB) {
 				HWND hWndFocused = GetFocus();
 				if (hWndFocused == mhWndEdit) SetFocus(mhWndOK);
@@ -402,7 +413,7 @@ bool InputBox::GetString(wstring & _result)
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	return ret;
+	return returnCode;
 }
 
 long InputBox::GetDiameterX(RECT _rect)
