@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-t title -m "message\nyqwteuyqw teqyuwteuyqwte uyqwet uytqweuytqweuyqw"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-t title -m "message\nyqwteuyqw teqyuwteuyqwte uyqwet uytqweuytqweuyqw" -font courier -fs 20 -l 2 -iconapp amiga.ico</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

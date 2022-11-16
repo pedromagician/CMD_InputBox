@@ -3,34 +3,14 @@
 #include "Conversion.h"
 #include "Monitors.h"
 
-HFONT	InputBox::mhFont		= nullptr;
-HWND	InputBox::mhWndParent	= nullptr;
-HWND	InputBox::mhWndPrompt	= nullptr;
-HWND	InputBox::mhWndInputBox	= nullptr;
-HWND	InputBox::mhWndEdit		= nullptr;
-HWND	InputBox::mhWndOK		= nullptr;
-HWND	InputBox::mhWndCancel	= nullptr;
-HBRUSH	InputBox::mhbrBkgnd		= nullptr;
-
-int		InputBox::width					= 600;
-int		InputBox::fontSize				= 22;
-int		InputBox::linesOfText			= 1;
-bool	InputBox::password				= false;
-wstring	InputBox::fontName				= _T("Consolas");
-bool	InputBox::topMost				= false;
-bool	InputBox::blockParent			= false;
-
-wstring InputBox::title					= _T("Input Box");
-wstring InputBox::prompt				= _T("Please input text");
-wstring InputBox::def					= _T("");
-
-wstring InputBox::iconApp				= _T("");
-
-pair<bool, wstring>	InputBox::brush		= pair<bool, wstring>(false, _T("#000000"));
-pair<bool, wstring> InputBox::background= pair<bool, wstring>(false, _T("#000000"));
-pair<bool, wstring> InputBox::pen		= pair<bool, wstring>(false, _T("#ffffff"));
-
-struct InputBox::InformationAboutPositionOfInputBox InputBox::position;
+static HFONT mhFont;
+static HWND  mhWndParent;
+static HWND  mhWndPrompt;
+static HWND  mhWndInputBox;
+static HWND  mhWndEdit;
+static HWND  mhWndOK;
+static HWND  mhWndCancel;
+static HBRUSH mhbrBkgnd;
 
 void InputBox::SetTextAlignment(HWND _hwnd, int _textAlignment)
 {
@@ -79,21 +59,21 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 		case WM_CTLCOLORSTATIC:
 		{
 			int r = 0, g = 0, b = 0;
-			if (brush.first) {
+			if (Brush().first) {
 				if (mhbrBkgnd == nullptr) {
-					Conversion::HexToRGB(brush.second, r, g, b);
+					Conversion::HexToRGB(Brush().second, r, g, b);
 					mhbrBkgnd = CreateSolidBrush(RGB(r, g, b));
 				}
 			}
 
 			HDC hdcStatic = (HDC)_wParam;
-			if (pen.first) {
-				Conversion::HexToRGB(pen.second, r, g, b);
+			if (Pen().first) {
+				Conversion::HexToRGB(Pen().second, r, g, b);
 				SetTextColor(hdcStatic, RGB(r, g, b));
 			}
 
-			if (background.first) {
-				Conversion::HexToRGB(background.second, r, g, b);
+			if (Background().first) {
+				Conversion::HexToRGB(Background().second, r, g, b);
 				SetBkColor(hdcStatic, RGB(r, g, b));
 			}
 
@@ -102,8 +82,8 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 		}
 		case WM_CREATE: {
 			memset(&lfont, 0, sizeof(lfont));
-			lstrcpy(lfont.lfFaceName, (LPWSTR)InputBox::fontName.c_str());
-			lfont.lfHeight			= fontSize;
+			lstrcpy(lfont.lfFaceName, (LPWSTR)InputBox::FontName().c_str());
+			lfont.lfHeight			= FontSize();
 			lfont.lfWeight			= FW_NORMAL;//FW_BOLD;
 			lfont.lfItalic			= FALSE;
 			lfont.lfCharSet			= DEFAULT_CHARSET;
@@ -117,26 +97,26 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 			// input
 			int inputX = 5;
-			int inputY = 10 + fontSize / 2 + fontSize * linesOfText;
-			int inputWidth = InputBox::width - 30;
-			int inputHeight = fontSize + 2;
+			int inputY = 10 + FontSize() / 2 + FontSize() * LinesOfText();
+			int inputWidth = InputBox::Width() - 30;
+			int inputHeight = FontSize() + 2;
 
-			if (InputBox::password)	mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL | ES_PASSWORD , inputX, inputY, inputWidth, inputHeight, _hWnd, nullptr, hInst, nullptr);
+			if (InputBox::Password())	mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL | ES_PASSWORD , inputX, inputY, inputWidth, inputHeight, _hWnd, nullptr, hInst, nullptr);
 			else					mhWndEdit = CreateWindowEx(WS_EX_STATICEDGE, _T("edit"), _T(""), WS_VISIBLE | WS_CHILD | WS_TABSTOP | ES_AUTOHSCROLL/*ES_PASSWORD*/, inputX, inputY, inputWidth, inputHeight, _hWnd, nullptr, hInst, nullptr);
 			if (mhWndEdit == nullptr) return (LRESULT)nullptr;
 			SendMessage((mhWndEdit), WM_SETFONT, (WPARAM)mhFont, 0);
 
 			// buttons
-			int buttonWidth = fontSize * 120 / 22;
-			int buttonHeight = fontSize + 8;
-			int buttonX = InputBox::width - 25 - buttonWidth * 2 - 10 - 20;
+			int buttonWidth = FontSize() * 120 / 22;
+			int buttonHeight = FontSize() + 8;
+			int buttonX = InputBox::Width() - 25 - buttonWidth * 2 - 10 - 20;
 			int buttonY = inputY + inputHeight + 15;
 
 			mhWndOK = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Ok"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, buttonX, buttonY, buttonWidth, buttonHeight, _hWnd, nullptr, hInst, nullptr);
 			if (mhWndOK == nullptr) return (LRESULT)nullptr;
 			SendMessage((mhWndOK), WM_SETFONT, (WPARAM)mhFont, 0);
 
-			buttonX = InputBox::width - 25 - buttonWidth * 1 - 10;
+			buttonX = InputBox::Width() - 25 - buttonWidth * 1 - 10;
 
 			mhWndCancel = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Cancel"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, buttonX, buttonY, buttonWidth, buttonHeight, _hWnd, nullptr, hInst, nullptr);
 			if (mhWndCancel == nullptr) return (LRESULT)nullptr;
@@ -145,7 +125,7 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 			// message
 			int messageX = 5;
 			int messageY = 10;
-			mhWndPrompt = CreateWindowEx(NULL, _T("static"), _T(""), WS_VISIBLE | WS_CHILD, messageX, messageY, inputWidth, fontSize * linesOfText, _hWnd, nullptr, hInst, nullptr);
+			mhWndPrompt = CreateWindowEx(NULL, _T("static"), _T(""), WS_VISIBLE | WS_CHILD, messageX, messageY, inputWidth, FontSize() * LinesOfText(), _hWnd, nullptr, hInst, nullptr);
 			if (mhWndPrompt == nullptr) return (LRESULT)nullptr;
 			SendMessage((mhWndPrompt), WM_SETFONT, (WPARAM)mhFont, 0);
 
@@ -158,7 +138,7 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 			bool monitor = true;
 			RECT monitorSize = { 0 };
 
-			switch (InputBox::position.monitor) {
+			switch (InputBox::Position().monitor) {
 			case _PRIMARY:
 				monitor = Monitors::GetMonitorInfoPrimary(monitorSize);
 				break;
@@ -167,25 +147,25 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 				break;
 			case _MOUSE_POINTER:
 				monitor = Monitors::GetMonitorInfoMouse(monitorSize);
-				InputBox::position.type = _POINTER;
+				InputBox::Position().type = _POINTER;
 				break;
 			case _ID:
-				monitor = Monitors::GetMonitorInfoId(InputBox::position.id, monitorSize);
+				monitor = Monitors::GetMonitorInfoId(InputBox::Position().id, monitorSize);
 				break;
 			}
 
-			if (InputBox::position.type == _POINTER) {
+			if (InputBox::Position().type == _POINTER) {
 				RECT mouseMonitorSize = { 0 };
 				monitor = Monitors::GetMonitorInfoMouse(mouseMonitorSize);
 				if (EqualRect(&mouseMonitorSize, &monitorSize) == false) {
-					InputBox::position.type = _CENTER;
+					InputBox::Position().type = _CENTER;
 				}
 			}
 
 			long x = 0;
 			long y = 0;
 			if (monitor) {
-				switch (InputBox::position.type) {
+				switch (InputBox::Position().type) {
 				case _CENTER: {
 					x = GetDiameterX(monitorSize) - GetWidth(dialogRect) / 2;
 					y = GetDiameterY(monitorSize) - GetHeight(dialogRect) / 2;
@@ -226,8 +206,8 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 					break;
 				}
 				default:
-					wcout << _T("Error - unknown position: ") << to_wstring(InputBox::position.type) << endl;
-					InputBox::position.type = _CENTER;
+					wcout << _T("Error - unknown position: ") << to_wstring(InputBox::Position().type) << endl;
+					InputBox::Position().type = _CENTER;
 					monitor = Monitors::GetMonitorInfoPrimary(monitorSize);
 					x = GetDiameterX(monitorSize) - GetWidth(dialogRect) / 2;
 					y = GetDiameterY(monitorSize) - GetHeight(dialogRect) / 2;
@@ -236,29 +216,29 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 			}
 			else {
 				wcout << _T("Error - problem loading information from the monitor") << endl;
-				InputBox::position.monitor = _PRIMARY;
-				InputBox::position.type = _XY;
+				InputBox::Position().monitor = _PRIMARY;
+				InputBox::Position().type = _XY;
 				x = monitorSize.left;
 				y = monitorSize.top;
 			}
 
-			x += InputBox::position.delta.x;
-			y += InputBox::position.delta.y;
+			x += InputBox::Position().delta.x;
+			y += InputBox::Position().delta.y;
 
 
 			UINT flags = SWP_NOSIZE | SWP_SHOWWINDOW;
-			if (InputBox::topMost == false)
+			if (InputBox::TopMost() == false)
 				flags |= SWP_NOZORDER;
 
 			SetWindowPos(_hWnd, HWND_TOPMOST, x, y, 0, 0, flags);
 
 			// icon app
-			if (InputBox::iconApp.empty() == false) {
+			if (InputBox::IconApp().empty() == false) {
 				HICON hIcon = nullptr;
-				hIcon = (HICON)LoadImage(hInst, InputBox::iconApp.c_str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+				hIcon = (HICON)LoadImage(hInst, InputBox::IconApp().c_str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 				if (!hIcon) {
 					HBITMAP bitmapForIconApp = nullptr;
-					bitmapForIconApp = (HBITMAP)LoadImage(hInst, InputBox::iconApp.c_str(), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+					bitmapForIconApp = (HBITMAP)LoadImage(hInst, InputBox::IconApp().c_str(), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 					if (bitmapForIconApp) {
 						ICONINFO ii = { 0 };
 						ii.fIcon = TRUE;
@@ -307,6 +287,15 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 bool InputBox::GetString(wstring & _result)
 {
+	mhFont			= nullptr;
+	mhWndParent		= nullptr;
+	mhWndPrompt		= nullptr;
+	mhWndInputBox	= nullptr;
+	mhWndEdit		= nullptr;
+	mhWndOK			= nullptr;
+	mhWndCancel		= nullptr;
+	mhbrBkgnd		= nullptr;
+
 	mhWndParent = GetActiveWindow();
 	if (!mhWndParent)
 		mhWndParent = GetForegroundWindow();
@@ -340,13 +329,13 @@ bool InputBox::GetString(wstring & _result)
 	}
 
 	// window
-	int inputY = 10 + fontSize / 2 + fontSize * linesOfText;
-	int inputHeight = fontSize + 2;
+	int inputY = 10 + FontSize() / 2 + FontSize() * LinesOfText();
+	int inputHeight = FontSize() + 2;
 	int buttonY = inputY + inputHeight + 15;
-	int buttonHeight = fontSize + 8;
+	int buttonHeight = FontSize() + 8;
 
 	HWND parent = nullptr;
-	if (InputBox::blockParent)
+	if (InputBox::BlockParent())
 		parent = mhWndParent;
 
 	DWORD dwStyle = WS_POPUPWINDOW | WS_CAPTION | WS_TABSTOP | WS_VISIBLE;
@@ -354,9 +343,9 @@ bool InputBox::GetString(wstring & _result)
 	dwStyle = dwStyle & ~WS_MINIMIZEBOX;
 
 	mhWndInputBox = CreateWindowEx(
-		WS_EX_DLGMODALFRAME, _T("InputBox"), InputBox::title.c_str(), dwStyle,
-		(rc.right - InputBox::width) / 2, (rc.bottom - InputBox::width / 2) / 2, 
-		InputBox::width, 50 + buttonY + buttonHeight,
+		WS_EX_DLGMODALFRAME, _T("InputBox"), InputBox::Title().c_str(), dwStyle,
+		(rc.right - InputBox::Width()) / 2, (rc.bottom - InputBox::Width() / 2) / 2,
+		InputBox::Width(), 50 + buttonY + buttonHeight,
 		parent, nullptr, nullptr, nullptr
 	);
 	if (mhWndInputBox == nullptr) {
@@ -372,14 +361,14 @@ bool InputBox::GetString(wstring & _result)
 	}
 
 	SetTextAlignment(mhWndPrompt, SS_LEFT);
-	SetWindowText(mhWndPrompt, prompt.c_str());
+	SetWindowText(mhWndPrompt, Prompt().c_str());
 	SetTextAlignment(mhWndEdit, SS_LEFT);
 	SetForegroundWindow(mhWndInputBox);
 
 	SendMessage((HWND)mhWndOK, BM_SETSTYLE, (WPARAM)LOWORD(BS_PUSHBUTTON), MAKELPARAM(TRUE, 0));
 	SendMessage((HWND)mhWndCancel, BM_SETSTYLE, (WPARAM)LOWORD(BS_PUSHBUTTON), MAKELPARAM(TRUE, 0));
 	SendMessage(mhWndEdit, EM_SETSEL, 0, -1);
-	SendMessage(mhWndEdit, EM_REPLACESEL, 0, (LPARAM)def.c_str());
+	SendMessage(mhWndEdit, EM_REPLACESEL, 0, (LPARAM)Def().c_str());
 	SendMessage(mhWndEdit, EM_SETSEL, 0, -1);
 	SetFocus(mhWndEdit);
 
