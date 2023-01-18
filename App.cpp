@@ -29,8 +29,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	InputBox::Position().delta		= { 0, 0 };
 
 	CommandLine cmd;
-	cmd.Add(CommandLine::_STRING,	2,	_T("-title"),		_T("-t"),				_T("The 'xxx' argument specifies the name of the dialog."),											&InputBox::Title());
-	cmd.Add(CommandLine::_STRING,	2,	_T("-message"),		_T("-m"),				_T("The 'xxx' argument specifies the text of the dialog. A new line can be inserted using \\n."),	&InputBox::Prompt());
+	cmd.Add(CommandLine::_STRING,	2,	_T("-title"),		_T("-t"),				_T("The 'xxx' argument specifies the name of the dialog."),																					&InputBox::Title());
+	cmd.Add(CommandLine::_STRING,	2,	_T("-message"),		_T("-m"),				_T("The 'xxx' argument specifies the text of the dialog. A new line can be inserted using \\n. Inserting Unicode characters \\u{1F44D}."),	&InputBox::Prompt());
 	cmd.Add(CommandLine::_STRING,	2,	_T("-default"),		_T("-d"),				_T("The 'xxx' argument specifies the default text of the input field."),							&InputBox::Def());
 	cmd.Add(CommandLine::_TRUE,		3,	_T("-help"),		_T("-h"),	_T("-?"),	_T("To view help."),																				&help);
 	cmd.Add(CommandLine::_TRUE,		2,	_T("-password"),	_T("-pass"),			_T("The toggle specifies that the text in the dialog box should be displayed with \"*\" characters, e.g. when entering passwords that should not be visible to the person standing behind the user."),	&InputBox::Password());
@@ -72,6 +72,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		InputBox::Position().monitor = InputBox::_ID;
 		InputBox::Position().id = (UINT)Conversion::ToInt(monitor);
 	}
+
+	Conversion::UnicodeCodeConverter(InputBox::Title());
+	Conversion::UnicodeCodeConverter(InputBox::Prompt());
 
 	wstring result = _T("");
 	if (InputBox::GetString(result) != 0) {
