@@ -11,3 +11,9 @@ InputBox for Windows command line.
 @call 1.bat\
 @echo %mytmp%
 ```
+
+```
+@SET mytmp=null
+@FOR /F "tokens=*" %%i IN ('InputBox.exe -title Title -message "Message..." -default text') DO @SET mytmp=%%i
+echo %mytmp%
+```
