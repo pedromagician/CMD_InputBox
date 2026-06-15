@@ -455,7 +455,7 @@ void CommandLine::Help()
 		}
 
 		if (p.type == ParamType::COLOR) {
-			wprintf(L"        Format: #RRGGBB or RRGGBB (Hex)\n");
+			wprintf(L"        Format: #RRGGBB, RRGGBB, #RGB or RGB (Hex)\n");
 			if (p.hasDefault) {
 				wprintf(L"        Default: #%02X%02X%02X\n", p.defaultColor.r, p.defaultColor.g, p.defaultColor.b);
 			}
