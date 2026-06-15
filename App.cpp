@@ -35,35 +35,35 @@ int _tmain(int argc, _TCHAR* argv[])
 	CommandLine cmd;
 	{
 		cmd.AddString({ _T("title"), _T("t") },
-			_T("Specifies the dialog title."),
+			_T("Specifies the title text displayed in the dialog window."),
 			InputBox::Title());
 
 		cmd.AddString({ _T("message"), _T("m") },
-			_T("Specifies the dialog message. Use \\n for a new line. Unicode supported via \\u{XXXX}."),
-			InputBox::Prompt());
+			_T("Specifies the message text displayed in the dialog. Use \\n for line breaks; Unicode characters supported via \\u{XXXX}."),
+				InputBox::Prompt());
 
 		cmd.AddString({ _T("default"), _T("d") },
-			_T("Specifies the default text in the input field."),
+			_T("Specifies the default text pre-filled in the input field."),
 			InputBox::Def());
 
 		cmd.AddBool({ _T("help"), _T("h"), _T("?") },
-			_T("Displays this help."),
+			_T("Displays this help information."),
 			help);
 
 		cmd.AddBool({ _T("password"), _T("pass") },
-			_T("Masks the input field with '*' characters (password mode)."),
-			InputBox::Password());
+			_T("Masks all input characters with '*' (password mode). Useful for sensitive data entry."),
+				InputBox::Password());
 
 		cmd.AddString({ _T("font"), _T("f") },
-			_T("Specifies the font name used in the dialog."),
+			_T("Specifies the font name used for rendering text in the dialog."),
 			InputBox::FontName());
 
 		cmd.AddInt({ _T("fontsize"), _T("fs") },
-			_T("Specifies the font size."),
+			_T("Specifies the font size in points."),
 			InputBox::FontSize());
 
 		cmd.AddInt({ _T("lines"), _T("l") },
-			_T("Specifies the number of message lines."),
+			_T("Specifies the number of lines allocated for the message text area."),
 			InputBox::LinesOfText());
 
 		cmd.AddInt({ _T("width"), _T("w") },
@@ -71,47 +71,47 @@ int _tmain(int argc, _TCHAR* argv[])
 			InputBox::Width());
 
 		cmd.AddColor({ _T("pen"), _T("p") },
-			_T("Specifies the pen color."),
+			_T("Specifies the pen color (text/gadget foreground color)."),
 			InputBox::Pen().second);
 
 		cmd.AddColor({ _T("background"), _T("b") },
-			_T("Specifies the background color."),
+			_T("Specifies the background fill color of the dialog."),
 			InputBox::Background().second);
 
 		cmd.AddColor({ _T("brush"), _T("br") },
-			_T("Specifies the brush color."),
+			_T("Specifies the brush color (area fill or pattern color)."),
 			InputBox::Brush().second);
 
 		cmd.AddColor({ _T("border"), _T("bo") },
-			_T("Specifies the border color."),
+			_T("Specifies the border frame color around the dialog."),
 			InputBox::Border().second);
 
 		cmd.AddString({ _T("monitor"), _T("mon") },
-			_T("Specifies the target monitor: Primary|Mouse|MousePointer|0|1|2|n."),
+			_T("Specifies the target monitor for display: Primary|Mouse|MousePointer|0|1|2|n (where n is monitor index)."),
 			monitor);
 
 		cmd.AddEnum({ _T("position"), _T("pos") },
-			_T("Specifies the dialog position: Center|Top|Bottom|Left|Right|Pointer|xy."),
+			_T("Specifies the dialog placement: Center|Top|Bottom|Left|Right|Pointer|xy."),
 			string2positionType, type);
 
 		cmd.AddInt({ _T("x") },
-			_T("Specifies the X‑axis position offset."),
+			_T("Specifies the X-axis offset from the base position in pixels."),
 			InputBox::Position().delta.x);
 
 		cmd.AddInt({ _T("y") },
-			_T("Specifies the Y‑axis position offset."),
+			_T("Specifies the Y-axis offset from the base position in pixels."),
 			InputBox::Position().delta.y);
 
 		cmd.AddBool({ _T("topmost") },
-			_T("Forces the dialog to stay above non‑topmost windows."),
+			_T("Forces the dialog to remain above all non-topmost windows."),
 			InputBox::TopMost());
 
 		cmd.AddString({ _T("iconapp") },
-			_T("Specifies the application icon file (ICO/BMP)."),
+			_T("Specifies the application icon file path (supports ICO/BMP formats)."),
 			InputBox::IconApp());
 
 		cmd.AddBool({ _T("block") },
-			_T("Blocks the parent process until the dialog is closed."),
+			_T("Blocks parent process execution until the dialog is closed (modal behavior)."),
 			InputBox::BlockParent());
 	}
 
@@ -120,6 +120,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		return 0;
 	}
 	InputBox::Position().type = (InputBox::POSITION)type;
+	InputBox::Pen().first = cmd.WasProvided(L"pen");
+	InputBox::Background().first = cmd.WasProvided(L"background");
+	InputBox::Brush().first = cmd.WasProvided(L"brush");
+	InputBox::Border().first = cmd.WasProvided(L"border");
 
 	if (InputBox::Prompt().empty()) {
 		wcout << _T("Error - message is empty") << endl;

@@ -464,3 +464,15 @@ void CommandLine::Help()
 		wprintf(L"\n");
 	}
 }
+
+bool CommandLine::WasProvided(const wstring& _name) const
+{
+	wstring key = Conversion::TrimWhiteChar(Conversion::ToLower(_name));
+
+	auto it = mAliasMap.find(key);
+	if (it == mAliasMap.end())
+		return false;
+
+	const ParamDef& p = mParams[it->second];
+	return p.seen;
+}

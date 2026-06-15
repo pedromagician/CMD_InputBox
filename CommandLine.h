@@ -87,5 +87,7 @@ public:
 	void AddColor(const vector<wstring>& _names, const wstring& _desc, ColorRGB& _outVar, RequiredParam _required, const ColorRGB& _defaultValue);
 
 	bool ParseCommandLine(int _argc, wchar_t** _argv, int& _correctCount);
+	bool WasProvided(const wstring& _name) const;
+
 	void Help();
 };
