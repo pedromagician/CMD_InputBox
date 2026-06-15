@@ -134,3 +134,69 @@ void Conversion::UnicodeCodeConverter(wstring& _mess)
 		}
 	}
 }
+
+wstring Conversion::ParseEscapeString(const wstring& _str)
+{
+	wstring out;
+	for (size_t i = 0; i < _str.size(); ++i) {
+		wchar_t c = _str[i];
+		if (c != L'\\') {
+			out.push_back(c);
+			continue;
+		}
+		if (i + 1 >= _str.size()) {
+			out.push_back(L'\\');
+			break;
+		}
+		wchar_t n = _str[++i];
+
+		// \n, \r, \t, \xHH, \uHHHH
+		switch (n) {
+		case L'n': out.push_back(L'\n'); break;
+		case L'r': out.push_back(L'\r'); break;
+		case L't': out.push_back(L'\t'); break;
+		case L'\\': out.push_back(L'\\'); break;
+		case L'\'': out.push_back(L'\''); break;
+		case L'"': out.push_back(L'"'); break;
+		case L'x':
+		case L'u':
+		{
+			int maxDigits = (n == L'x') ? 2 : 4;
+			int val = 0;
+			int digits = 0;
+			while (i + 1 < _str.size() && digits < maxDigits) {
+				wchar_t h = _str[i + 1];
+				int d;
+				if (h >= L'0' && h <= L'9') d = h - L'0';
+				else if (h >= L'a' && h <= L'f') d = 10 + (h - L'a');
+				else if (h >= L'A' && h <= L'F') d = 10 + (h - L'A');
+				else break;
+				val = (val << 4) | d;
+				++i;
+				++digits;
+			}
+
+			if (digits == 0) {
+				out.push_back(L'\\');
+				out.push_back(n);
+			}
+			else {
+				if (val >= 0xD800 && val <= 0xDFFF) {
+					out.push_back(L'\\');
+					out.push_back(n);
+					for (int k = 0; k < digits; ++k)
+						out.push_back(_str[i - digits + 1 + k]);
+				}
+				else {
+					out.push_back((wchar_t)val);
+				}
+			}
+			break;
+		}
+		default:
+			out.push_back(n);
+			break;
+		}
+	}
+	return out;
+}

@@ -257,6 +257,7 @@ bool CommandLine::ParseCommandLine(int _argc, wchar_t** _argv, int& _correctCoun
 				if (i + 1 >= _argc) return false;
 				*found->outString = _argv[++i];
 			}
+			*found->outString = Conversion::ParseEscapeString(*found->outString);
 			found->seen = true;
 			_correctCount++;
 			break;
@@ -455,7 +456,7 @@ void CommandLine::Help()
 		}
 
 		if (p.type == ParamType::COLOR) {
-			wprintf(L"        Format: #RRGGBB, RRGGBB, #RGB or RGB (Hex)\n");
+			wprintf(L"        Format: #RRGGBB or RRGGBB (Hex)\n");
 			if (p.hasDefault) {
 				wprintf(L"        Default: #%02X%02X%02X\n", p.defaultColor.r, p.defaultColor.g, p.defaultColor.b);
 			}

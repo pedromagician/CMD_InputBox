@@ -6,7 +6,7 @@ Designed for batch files, automation, PowerShell scripts, and tools that need si
 # ✨ Features
 
 - Simple invocation from CMD or PowerShell
-- Unicode support (\u{XXXX})
+- Unicode support (\u\{XXXX})
 - Password masking mode
 - Customizable colors, fonts, and window size
 - Multi‑monitor support

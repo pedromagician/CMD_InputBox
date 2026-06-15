@@ -17,4 +17,6 @@ public:
 
 	static wstring Utf32ToUtf16(char32_t ch);
 	static void UnicodeCodeConverter(wstring& _mess);
+
+	static wstring ParseEscapeString(const wstring& _str);
 };
