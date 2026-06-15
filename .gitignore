@@ -1,0 +1,7 @@
+.vs/
+Debug/
+Release/
+InputBox.vcxproj.user
+project.aps
+/git/revision.h
+/git/revision.h.new
