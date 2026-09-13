@@ -487,6 +487,8 @@ bool InputBox::GetString(wstring & _result)
 	);
 	if (!mhWndInputBox) {
 		wcout << L"CreateWindowEx failed: " << GetLastError() << endl;
+		if (parent)
+			EnableWindow(parent, TRUE);
 		return false;
 	}
 
