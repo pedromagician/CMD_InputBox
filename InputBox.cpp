@@ -388,8 +388,6 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 			HICON hIcon = (HICON)SendMessage(_hWnd, WM_GETICON, ICON_SMALL, 0);
 			if (hIcon) DestroyIcon(hIcon);
-			hIcon = (HICON)SendMessage(_hWnd, WM_GETICON, ICON_BIG, 0);
-			if (hIcon) DestroyIcon(hIcon);
 
 			EnableWindow(mhWndParent, TRUE);
 			SetForegroundWindow(mhWndParent);
