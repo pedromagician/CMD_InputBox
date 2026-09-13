@@ -135,6 +135,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	else if (monitor == _T("mouse"))		InputBox::Position().monitor = InputBox::_MOUSE;
 	else if (monitor == _T("mousepointer"))	InputBox::Position().monitor = InputBox::_MOUSE_POINTER;
 	else {
+		if (monitor.empty() || monitor.find_first_not_of(_T("0123456789")) != wstring::npos) {
+			wcout << _T("Error - invalid monitor: ") << monitor << endl;
+			return 1;
+		}
 		InputBox::Position().monitor = InputBox::_ID;
 		InputBox::Position().id = (UINT)Conversion::ToInt(monitor);
 	}
