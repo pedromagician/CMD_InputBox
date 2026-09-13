@@ -40,7 +40,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		cmd.AddString({ _T("message"), _T("m") },
 			_T("Specifies the message text displayed in the dialog. Use \\n for line breaks; Unicode characters supported via \\u{XXXX}."),
-				InputBox::Prompt());
+				InputBox::Prompt(), true);
 
 		cmd.AddString({ _T("default"), _T("d") },
 			_T("Specifies the default text pre-filled in the input field."),
@@ -115,7 +115,11 @@ int _tmain(int argc, _TCHAR* argv[])
 			InputBox::BlockParent());
 	}
 
-	if (!cmd.ParseCommandLine(argc, argv, correctParameters) || correctParameters == 0 || help) {
+	if (!cmd.ParseCommandLine(argc, argv, correctParameters)) {
+		wprintf(L"Run with -help for usage information.\n");
+		return 0;
+	}
+	if (correctParameters == 0 || help) {
 		cmd.Help();
 		return 0;
 	}
