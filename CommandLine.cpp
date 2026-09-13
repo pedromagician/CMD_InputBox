@@ -242,7 +242,10 @@ bool CommandLine::ParseCommandLine(int _argc, wchar_t** _argv, int& _correctCoun
 				*found->outInt = _wtoi(value.c_str());
 			}
 			else {
-				if (i + 1 >= _argc) return false;
+				if (i + 1 >= _argc) {
+					wprintf(L"Missing value for parameter -%s\n", found->names[0].c_str());
+					return false;
+				}
 				*found->outInt = _wtoi(_argv[++i]);
 			}
 			found->seen = true;
@@ -254,7 +257,10 @@ bool CommandLine::ParseCommandLine(int _argc, wchar_t** _argv, int& _correctCoun
 				*found->outString = value;
 			}
 			else {
-				if (i + 1 >= _argc) return false;
+				if (i + 1 >= _argc) {
+					wprintf(L"Missing value for parameter -%s\n", found->names[0].c_str());
+					return false;
+				}
 				*found->outString = _argv[++i];
 			}
 			*found->outString = Conversion::ParseEscapeString(*found->outString);
@@ -279,7 +285,10 @@ bool CommandLine::ParseCommandLine(int _argc, wchar_t** _argv, int& _correctCoun
 				}
 			}
 			else {
-				if (i + 1 >= _argc) return false;
+				if (i + 1 >= _argc) {
+					wprintf(L"Missing value for parameter -%s\n", found->names[0].c_str());
+					return false;
+				}
 				wstring val = _argv[++i];
 
 				wstring valLower = Conversion::ToLower(val);
@@ -310,7 +319,10 @@ bool CommandLine::ParseCommandLine(int _argc, wchar_t** _argv, int& _correctCoun
 				*found->outChar = value[0];
 			}
 			else {
-				if (i + 1 >= _argc) return false;
+				if (i + 1 >= _argc) {
+					wprintf(L"Missing value for parameter -%s\n", found->names[0].c_str());
+					return false;
+				}
 				wstring val = Conversion::TrimWhiteChar(_argv[++i]);
 				if (val.empty()) {
 					wprintf(L"Invalid char value for -%s\n", found->names[0].c_str());
