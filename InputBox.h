@@ -63,7 +63,13 @@ public:
 private:
 	static LRESULT CALLBACK WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LPARAM _lParam);
 
-	static void SetTextAlignment(HWND _hwnd, int _textAlignment);
+	static void SetTextAlignment(HWND _hwnd, LONG_PTR _alignStyle);
+
+	static int GetInputY();
+	static int GetInputHeight();
+	static int GetButtonY();
+	static int GetButtonHeight();
+	static int GetDialogHeight();
 
 	static long GetDiameterX(RECT _rect);
 	static long GetDiameterY(RECT _rect);

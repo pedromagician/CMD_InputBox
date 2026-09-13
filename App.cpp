@@ -46,7 +46,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			_T("Specifies the default text pre-filled in the input field."),
 			InputBox::Def());
 
-		cmd.AddBool({ _T("help"), _T("h"), _T("?") },
+		cmd.AddHelp({ _T("help"), _T("h"), _T("?") },
 			_T("Displays this help information."),
 			help);
 

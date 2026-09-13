@@ -16,22 +16,17 @@ static HPEN   mhPenBorder = nullptr;
 static COLORREF g_bgColor = RGB(240, 240, 240);
 static COLORREF g_borderColor = RGB(0, 0, 0);
 
-void InputBox::SetTextAlignment(HWND _hwnd, int _textAlignment)
+void InputBox::SetTextAlignment(HWND _hwnd, LONG_PTR _alignStyle)
 {
 	LONG_PTR style = GetWindowLongPtr(_hwnd, GWL_STYLE);
 	LONG_PTR currentAlign = style & (SS_LEFT | SS_CENTER | SS_RIGHT);
 
-	LONG_PTR desiredAlign = 0;
-	if (_textAlignment == 0)      desiredAlign = SS_LEFT;
-	else if (_textAlignment == 1) desiredAlign = SS_CENTER;
-	else if (_textAlignment == 2) desiredAlign = SS_RIGHT;
-
-	if (currentAlign == desiredAlign)
+	if (currentAlign == _alignStyle)
 		return;
 
 	style &= ~(SS_LEFT | SS_CENTER | SS_RIGHT);
 
-	style |= desiredAlign;
+	style |= _alignStyle;
 
 	if (SetWindowLongPtr(_hwnd, GWL_STYLE, style) == 0) {
 		if (GetLastError() != 0) {
@@ -183,9 +178,9 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 			// input
 			int inputX = 5;
-			int inputY = 10 + FontSize() / 2 + FontSize() * LinesOfText();
+			int inputY = GetInputY();
 			int inputWidth = InputBox::Width() - 30;
-			int inputHeight = FontSize() + 2;
+			int inputHeight = GetInputHeight();
 
 			DWORD exStyle = WS_EX_STATICEDGE;
 
@@ -204,9 +199,9 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 
 			// buttons
 			int buttonWidth = FontSize() * 120 / 22;
-			int buttonHeight = FontSize() + 8;
+			int buttonHeight = GetButtonHeight();
 			int buttonX = InputBox::Width() - 25 - buttonWidth * 2 - 10 - 20;
-			int buttonY = inputY + inputHeight + 15;
+			int buttonY = GetButtonY();
 
 			mhWndOK = CreateWindowEx(WS_EX_STATICEDGE, _T("Button"), _T("Ok"), WS_VISIBLE | WS_CHILD | WS_TABSTOP, buttonX, buttonY, buttonWidth, buttonHeight, _hWnd, nullptr, hInst, nullptr);
 			if (mhWndOK == nullptr) return (LRESULT)nullptr;
@@ -455,12 +450,6 @@ bool InputBox::GetString(wstring & _result)
 		}
 	}
 
-	// window
-	int inputY = 10 + FontSize() / 2 + FontSize() * LinesOfText();
-	int inputHeight = FontSize() + 2;
-	int buttonY = inputY + inputHeight + 15;
-	int buttonHeight = FontSize() + 8;
-
 	HWND parent = nullptr;
 	if (InputBox::BlockParent())
 		parent = mhWndParent;
@@ -473,7 +462,7 @@ bool InputBox::GetString(wstring & _result)
 	dwStyle = dwStyle & ~WS_MINIMIZEBOX;
 
 	int dialogWidth = InputBox::Width();
-	int dialogHeight = 50 + buttonY + buttonHeight;
+	int dialogHeight = GetDialogHeight();
 
 	int x = rc.left + (GetWidth(rc) - dialogWidth) / 2;
 	int y = rc.top + (GetHeight(rc) - dialogHeight) / 2;
@@ -562,6 +551,31 @@ bool InputBox::GetString(wstring & _result)
 		DispatchMessage(&msg);
 	}
 	return returnCode;
+}
+
+int InputBox::GetInputY()
+{
+	return 10 + FontSize() / 2 + FontSize() * LinesOfText();
+}
+
+int InputBox::GetInputHeight()
+{
+	return FontSize() + 2;
+}
+
+int InputBox::GetButtonY()
+{
+	return GetInputY() + GetInputHeight() + 15;
+}
+
+int InputBox::GetButtonHeight()
+{
+	return FontSize() + 8;
+}
+
+int InputBox::GetDialogHeight()
+{
+	return 50 + GetButtonY() + GetButtonHeight();
 }
 
 long InputBox::GetDiameterX(RECT _rect)
