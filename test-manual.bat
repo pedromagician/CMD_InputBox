@@ -40,6 +40,7 @@ set "LOG=%SCRIPT_DIR%test-results.txt"
 rem Testovacia ikona aplikacie patri do projektu, nie niekam do profilu
 rem pouzivatela - pouziva sa priamo tá, co uz je v Resources\.
 set "ICONAPP_ARG=%SCRIPT_DIR:\=/%Resources/icon1.ico"
+set "ICONAPP_PNG_ARG=%SCRIPT_DIR:\=/%Resources/icon-transparent.png"
 
 set /a TOTAL=0
 set /a PASS=0
@@ -172,6 +173,10 @@ echo ############################################################
 set "ID=E1-iconapp"
 set "DESC=V titulku okna a na paneli uloh je vlastna ikona z Resources\icon1.ico namiesto predvolenej."
 call :runtest -iconapp "%ICONAPP_ARG%" -m "Vlastna ikona aplikacie"
+
+set "ID=E2-iconapp-png-transparent"
+set "DESC=V titulku okna a na paneli uloh je ikona z Resources\icon-transparent.png: cerveny kruh v strede polopriesvitneho modreho kruhu. Rohy ikony su priesvitne - nesmu byt ani cierne ani biele, vidno cez ne farbu titulku / panela uloh."
+call :runtest -iconapp "%ICONAPP_PNG_ARG%" -m "Priesvitna PNG ikona"
 
 rem =============================================================
 rem F. POZICOVANIE A MONITORY

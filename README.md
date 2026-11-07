@@ -46,7 +46,7 @@ InputBox.exe -t "Search" -m "Enter query:" -default "example"
 | `-x` | X‑axis offset in pixels. |
 | `-y` | Y‑axis offset in pixels. |
 | `-topmost` | Keeps the dialog above other windows. |
-| `-iconapp` | Path to ICO/BMP icon. |
+| `-iconapp` | Path to ICO/BMP/PNG/JPG/GIF icon (PNG/GIF transparency supported; GIF uses the first frame). |
 | `-block` | Blocks the parent process until the dialog closes. |
 
 

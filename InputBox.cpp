@@ -3,6 +3,36 @@
 #include "Conversion.h"
 #include "Monitors.h"
 
+// GDI+ headers declare operator new, which clashes with the DEBUG_NEW macro
+#ifdef _DEBUG
+#	pragma push_macro("new")
+#	undef new
+#endif
+#include <gdiplus.h>
+#ifdef _DEBUG
+#	pragma pop_macro("new")
+#endif
+#pragma comment(lib, "gdiplus.lib")
+
+// Loads PNG (with alpha channel) as HICON via GDI+. Returns nullptr on failure.
+static HICON LoadPngIcon(const wstring& path) {
+	Gdiplus::GdiplusStartupInput gsi;
+	ULONG_PTR token = 0;
+	if (Gdiplus::GdiplusStartup(&token, &gsi, nullptr) != Gdiplus::Ok)
+		return nullptr;
+
+	HICON hIcon = nullptr;
+	{
+		Gdiplus::Bitmap bmp(path.c_str());
+		if (bmp.GetLastStatus() == Gdiplus::Ok) {
+			// GetHICON preserves per-pixel alpha (transparent PNG)
+			bmp.GetHICON(&hIcon);
+		}
+	}
+	Gdiplus::GdiplusShutdown(token);
+	return hIcon;
+}
+
 static HFONT mhFont;
 static HWND  mhWndParent;
 static HWND  mhWndPrompt;
@@ -334,6 +364,9 @@ LRESULT CALLBACK InputBox::WndProc(HWND _hWnd, UINT _message, WPARAM _wParam, LP
 			// icon app
 			if (InputBox::IconApp().empty() == false) {
 				HICON hIcon = (HICON)LoadImage(hInst, InputBox::IconApp().c_str(), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
+				if (!hIcon) {
+					hIcon = LoadPngIcon(InputBox::IconApp());
+				}
 				if (!hIcon) {
 					HBITMAP bitmapForIconApp = nullptr;
 					bitmapForIconApp = (HBITMAP)LoadImage(hInst, InputBox::IconApp().c_str(), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);

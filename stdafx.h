@@ -1,5 +1,6 @@
 #pragma once
 
+#define _HAS_STD_BYTE 0 // avoid std::byte vs. rpcndr byte ambiguity (GDI+)
 #include <windows.h>
 #include <algorithm>
 #include <atlbase.h>
